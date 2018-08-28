@@ -14,12 +14,12 @@ export class SvgPreviewManager {
     }
 
     public preview(uri: vscode.Uri) {
-        let settingsUri = 'settings-preview://my-extension/fake/path/to/settings';
-        // ERROR: cannot open settings-preview://my-extension/fake/path/to/settings. Detail: resource is not available
-        vscode.workspace.openTextDocument(vscode.Uri.parse(settingsUri))
+        vscode.workspace.openTextDocument(this.normalizeUri(uri))
             .then (doc => {
                 const panel = vscode.window.createWebviewPanel('catCoding', "Cat Coding", vscode.ViewColumn.Two, { });
                 panel.webview.html = doc.getText();
+                
+                // vscode.commands.executeCommand('vscode.previewHtml', uri, 2, doc.getText());
             });
     }
 
@@ -27,4 +27,11 @@ export class SvgPreviewManager {
         this._disposables.forEach(el => el.dispose());
         this._disposables = [];
     }
+
+    private normalizeUri(uri: vscode.Uri): vscode.Uri {
+        return uri.with({
+            scheme: SvgPreviewManager.contentProviderKey,
+            query: uri.toString()
+        });
+    } 
 }

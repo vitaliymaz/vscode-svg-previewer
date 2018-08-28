@@ -9,6 +9,8 @@ export class SvgLangIdIdentifier {
     constructor() {
         this.onChangeActiveEditor(vscode.window.activeTextEditor);
 
+        // It doesn't fire this event after you close a preview panel and focus returs to editor. 
+        // Looks like a vscode bug. 
         this._displosables.push(vscode.window.onDidChangeActiveTextEditor(this.onChangeActiveEditor.bind(this)));
     }
 
@@ -20,13 +22,12 @@ export class SvgLangIdIdentifier {
         vscode.commands.executeCommand('setContext', SvgLangIdIdentifier.svgPreviewActiveContextKey, value);
     }
 
-    public displose(): void {
+    public dispose(): void {
         this._displosables.forEach(el => el.dispose());
         this._displosables = [];
     }
 
     private onChangeActiveEditor(editor?: vscode.TextEditor): void {
-        console.log(editor);
         if (this.isSvgEditor(editor)) {
             this.setSvgActiveContext(true);
         } else {

@@ -25,7 +25,6 @@ export class CommandManager {
 		if (this.commands.has(id)) {
 			return;
 		}
-		console.log(`register ${id} ${impl} ${thisArg}`);
 		this.commands.set(id, vscode.commands.registerCommand(id, impl, thisArg));
 	}
 }
