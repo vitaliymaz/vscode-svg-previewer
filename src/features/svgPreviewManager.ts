@@ -20,8 +20,7 @@ export class SvgPreviewManager {
                 const panel = vscode.window.createWebviewPanel(
                     SvgPreviewManager.contentProviderKey,
                     this.getPreviewTitle(doc.fileName),
-                    vscode.ViewColumn.Two,
-                    {}
+                    vscode.ViewColumn.Beside
                 );
                 panel.webview.html = doc.getText();
             });
