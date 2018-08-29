@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 export class SvgPreviewManager {
     private static readonly contentProviderKey = 'svg-preview';
@@ -6,7 +7,7 @@ export class SvgPreviewManager {
     private _disposables: vscode.Disposable[] = [];
 
     constructor(
-        private readonly _contentProvider: vscode.TextDocumentContentProvider
+        private readonly _contentProvider: vscode.TextDocumentContentProvider,
     ) {
         this._disposables.push(
             vscode.workspace.registerTextDocumentContentProvider (SvgPreviewManager.contentProviderKey, this._contentProvider)
@@ -16,10 +17,13 @@ export class SvgPreviewManager {
     public preview(uri: vscode.Uri) {
         vscode.workspace.openTextDocument(this.normalizeUri(uri))
             .then (doc => {
-                const panel = vscode.window.createWebviewPanel('catCoding', "Cat Coding", vscode.ViewColumn.Two, { });
+                const panel = vscode.window.createWebviewPanel(
+                    SvgPreviewManager.contentProviderKey,
+                    this.getPreviewTitle(doc.fileName),
+                    vscode.ViewColumn.Two,
+                    {}
+                );
                 panel.webview.html = doc.getText();
-                
-                // vscode.commands.executeCommand('vscode.previewHtml', uri, 2, doc.getText());
             });
     }
 
@@ -33,5 +37,9 @@ export class SvgPreviewManager {
             scheme: SvgPreviewManager.contentProviderKey,
             query: uri.toString()
         });
-    } 
+    }
+
+    private getPreviewTitle(path: string): string {
+        return `Preview ${path.replace(/^.*[\\\/]/, '')}`;
+    }
 }

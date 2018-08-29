@@ -8,10 +8,10 @@ import { CommandManager } from './commandManager';
 import * as commands from './commands';
 
 export function activate(context: vscode.ExtensionContext) {
-    const contentProvider = new SvgContentProvider();
+    const contentProvider = new SvgContentProvider(context.extensionPath);
     const previewManager = new SvgPreviewManager(contentProvider);
     context.subscriptions.push(previewManager);
-
+    
     context.subscriptions.push(new SvgLangIdIdentifier());
 
     const commandManager = new CommandManager();
