@@ -17,22 +17,29 @@
     "contributes": {
         "commands": [
             {
-				"command": "svg.showPreviewToSide",
-				"title": "%svg.previewSide.title%",
-				"category": "Svg",
-				"icon": {
-					"light": "./media/PreviewOnRightPane_16x.svg",
-					"dark": "./media/PreviewOnRightPane_16x_dark.svg"
-				}
-			}
+                "command": "svg.showPreviewToSide",
+                "title": "%svg.previewSide.title%",
+                "category": "Svg",
+                "icon": {
+                    "light": "./media/PreviewOnRightPane_16x.svg",
+                    "dark": "./media/PreviewOnRightPane_16x_dark.svg"
+                }
+            }
         ],
         "menus": {
-			"editor/title": [
-				{
-					"command": "svg.showPreviewToSide",
-					"when": "svgActive",
-					"alt": "svg.showPreview",
-					"group": "navigation"
+            "editor/title": [
+                {
+                    "command": "svg.showPreviewToSide",
+                    "when": "svgActive",
+                    "alt": "svg.showPreview",
+                    "group": "navigation"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "svg.showPreviewToSide",
+                    "when": "svgActive",
+                    "group": "navigation"
                 }
             ]
         }

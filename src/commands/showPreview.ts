@@ -5,9 +5,11 @@ import { SvgPreviewManager } from '../features/svgPreviewManager';
 
 async function showPreview(
 	webviewManager: SvgPreviewManager,
-	uri: vscode.Uri,
+	uri?: vscode.Uri,
 ): Promise<any> {
-	webviewManager.preview(uri);
+	if (uri) {
+		webviewManager.preview(uri);
+	}
 }
 
 export class ShowPreviewToSideCommand implements Command {
@@ -18,6 +20,10 @@ export class ShowPreviewToSideCommand implements Command {
 	) { }
 
 	public execute(uri: vscode.Uri) {
-		showPreview(this.webviewManager, uri);
+		showPreview(this.webviewManager, uri? uri : this.getActiveEditorUri());
+	}
+
+	private getActiveEditorUri(): vscode.Uri | undefined {
+		return vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.uri;
 	}
 }

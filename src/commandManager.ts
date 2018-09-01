@@ -22,9 +22,6 @@ export class CommandManager {
 	}
 
 	private registerCommand(id: string, impl: (...args: any[]) => void, thisArg?: any) {
-		if (this.commands.has(id)) {
-			return;
-		}
 		this.commands.set(id, vscode.commands.registerCommand(id, impl, thisArg));
 	}
 }
