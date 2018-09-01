@@ -1,20 +1,26 @@
 import * as vscode from 'vscode';
 
 import { Command } from '../commandManager';
-import { SvgPreviewManager } from '../features/svgPreviewManager';
+import { PreviewManager } from '../features/previewManager';
 
 abstract class PreviewCommand {
 	public constructor(
-		protected readonly webviewManager: SvgPreviewManager
+		protected readonly webviewManager: PreviewManager
 	) { }
 
-	protected showPreview(webviewManager: SvgPreviewManager, uri: vscode.Uri, viewColumn: vscode.ViewColumn): void {
-		webviewManager.preview(uri, viewColumn);
+	protected showPreview(webviewManager: PreviewManager, uri: vscode.Uri, viewColumn: vscode.ViewColumn): void {
+		if (this.isSvgUri(uri)) {
+			webviewManager.showPreview(uri, viewColumn);
+		}
 	}
 
 	protected getActiveEditorUri(): vscode.Uri | undefined {
 		return vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.uri;
 	}
+
+	private isSvgUri(uri: vscode.Uri) {
+        return uri.path.endsWith('.svg');
+    }
 }
 
 

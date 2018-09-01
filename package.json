@@ -29,26 +29,46 @@
                     "light": "./media/PreviewOnRightPane_16x.svg",
                     "dark": "./media/PreviewOnRightPane_16x_dark.svg"
                 }
-            }
+            },
+            {
+				"command": "svg.showSource",
+				"title": "%svg.showSource.title%",
+				"category": "Svg",
+				"icon": {
+					"light": "./media/ViewSource.svg",
+					"dark": "./media/ViewSource_inverse.svg"
+				}
+			}
         ],
         "menus": {
             "editor/title": [
                 {
                     "command": "svg.showPreviewToSide",
-                    "when": "svgActive",
+                    "when": "editorLangId == xml",
                     "alt": "svg.showPreview",
+                    "group": "navigation"
+                },
+                {
+                    "command": "svg.showSource",
+                    "when": "svgPreviewFocus",
+                    "alt": "svg.showSource",
                     "group": "navigation"
                 }
             ],
             "commandPalette": [
                 {
                     "command": "svg.showPreview",
-                    "when": "svgActive",
+                    "when": "editorLangId == xml",
                     "group": "navigation"
                 },
                 {
                     "command": "svg.showPreviewToSide",
-                    "when": "svgActive",
+                    "when": "editorLangId == xml",
+                    "group": "navigation"
+                },
+                {
+                    "command": "svg.showSource",
+                    "when": "svgPreviewFocus",
                     "group": "navigation"
                 }
             ]
