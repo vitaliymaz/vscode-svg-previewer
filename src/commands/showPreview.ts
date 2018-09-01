@@ -3,27 +3,39 @@ import * as vscode from 'vscode';
 import { Command } from '../commandManager';
 import { SvgPreviewManager } from '../features/svgPreviewManager';
 
-async function showPreview(
-	webviewManager: SvgPreviewManager,
-	uri?: vscode.Uri,
-): Promise<any> {
-	if (uri) {
-		webviewManager.preview(uri);
+abstract class PreviewCommand {
+	public constructor(
+		protected readonly webviewManager: SvgPreviewManager
+	) { }
+
+	protected showPreview(webviewManager: SvgPreviewManager, uri: vscode.Uri, viewColumn: vscode.ViewColumn): void {
+		webviewManager.preview(uri, viewColumn);
+	}
+
+	protected getActiveEditorUri(): vscode.Uri | undefined {
+		return vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.uri;
 	}
 }
 
-export class ShowPreviewToSideCommand implements Command {
+
+export class ShowPreviewCommand extends PreviewCommand implements Command  {
+	public readonly id = 'svg.showPreview';
+
+	public execute(uri?: vscode.Uri) {
+		const resource = uri || this.getActiveEditorUri();
+		if (resource) {
+			this.showPreview(this.webviewManager, resource, vscode.ViewColumn.Active);
+		}
+	}
+}
+
+export class ShowPreviewToSideCommand extends PreviewCommand implements Command  {
 	public readonly id = 'svg.showPreviewToSide';
 
-	public constructor(
-		private readonly webviewManager: SvgPreviewManager
-	) { }
-
-	public execute(uri: vscode.Uri) {
-		showPreview(this.webviewManager, uri? uri : this.getActiveEditorUri());
-	}
-
-	private getActiveEditorUri(): vscode.Uri | undefined {
-		return vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.uri;
+	public execute(uri?: vscode.Uri) {
+		const resource = uri || this.getActiveEditorUri();
+		if (resource) {
+			this.showPreview(this.webviewManager, resource, vscode.ViewColumn.Beside);
+		}
 	}
 }

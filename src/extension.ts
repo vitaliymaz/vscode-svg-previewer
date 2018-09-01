@@ -16,7 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     const commandManager = new CommandManager();
 	context.subscriptions.push(commandManager);
-	commandManager.register(new commands.ShowPreviewToSideCommand(previewManager));
+    commandManager.register(new commands.ShowPreviewToSideCommand(previewManager));
+    commandManager.register(new commands.ShowPreviewCommand(previewManager));
 }
 
 export function deactivate() {

@@ -17,6 +17,11 @@
     "contributes": {
         "commands": [
             {
+				"command": "svg.showPreview",
+				"title": "%svg.preview.title%",
+				"category": "Svg"
+			},
+            {
                 "command": "svg.showPreviewToSide",
                 "title": "%svg.previewSide.title%",
                 "category": "Svg",
@@ -36,6 +41,11 @@
                 }
             ],
             "commandPalette": [
+                {
+                    "command": "svg.showPreview",
+                    "when": "svgActive",
+                    "group": "navigation"
+                },
                 {
                     "command": "svg.showPreviewToSide",
                     "when": "svgActive",

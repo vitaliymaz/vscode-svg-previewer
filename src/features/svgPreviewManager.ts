@@ -13,13 +13,13 @@ export class SvgPreviewManager {
         );
     }
 
-    public preview(uri: vscode.Uri) {
+    public preview(uri: vscode.Uri, viewColumn: vscode.ViewColumn) {
         vscode.workspace.openTextDocument(this.normalizeUri(uri))
             .then (doc => {
                 const panel = vscode.window.createWebviewPanel(
                     SvgPreviewManager.contentProviderKey,
                     this.getPreviewTitle(doc.fileName),
-                    vscode.ViewColumn.Beside
+                    viewColumn
                 );
                 panel.webview.html = doc.getText();
             });

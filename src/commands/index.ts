@@ -1,1 +1,1 @@
-export { ShowPreviewToSideCommand } from './showPreview';
+export { ShowPreviewCommand, ShowPreviewToSideCommand } from './showPreview';
