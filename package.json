@@ -11,16 +11,68 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onLanguage:xml"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
-            }
-        ]
+				"command": "svg.showPreview",
+				"title": "%svg.preview.title%",
+				"category": "Svg"
+			},
+            {
+                "command": "svg.showPreviewToSide",
+                "title": "%svg.previewSide.title%",
+                "category": "Svg",
+                "icon": {
+                    "light": "./media/PreviewOnRightPane_16x.svg",
+                    "dark": "./media/PreviewOnRightPane_16x_dark.svg"
+                }
+            },
+            {
+				"command": "svg.showSource",
+				"title": "%svg.showSource.title%",
+				"category": "Svg",
+				"icon": {
+					"light": "./media/ViewSource.svg",
+					"dark": "./media/ViewSource_inverse.svg"
+				}
+			}
+        ],
+        "menus": {
+            "editor/title": [
+                {
+                    "command": "svg.showPreviewToSide",
+                    "when": "editorLangId == xml",
+                    "alt": "svg.showPreview",
+                    "group": "navigation"
+                },
+                {
+                    "command": "svg.showSource",
+                    "when": "svgPreviewFocus",
+                    "alt": "svg.showSource",
+                    "group": "navigation"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "svg.showPreview",
+                    "when": "editorLangId == xml",
+                    "group": "navigation"
+                },
+                {
+                    "command": "svg.showPreviewToSide",
+                    "when": "editorLangId == xml",
+                    "group": "navigation"
+                },
+                {
+                    "command": "svg.showSource",
+                    "when": "svgPreviewFocus",
+                    "group": "navigation"
+                }
+            ]
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

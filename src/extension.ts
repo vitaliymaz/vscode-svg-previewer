@@ -1,29 +1,25 @@
-'use strict';
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+import { SvgContentProvider } from './features/previewContentProvider';
+import { PreviewManager } from './features/previewManager';
+
+import { CommandManager } from './commandManager';
+import * as commands from './commands';
+
 export function activate(context: vscode.ExtensionContext) {
+    const contentProvider = new SvgContentProvider(context.extensionPath);
+    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider ('svg-preview', contentProvider));
 
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "view-svg-proto" is now active!');
+    const previewManager = new PreviewManager();
+    context.subscriptions.push(previewManager);
 
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with  registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('extension.sayHello', () => {
-        // The code you place here will be executed every time your command is executed
-
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World!');
-    });
-
-    context.subscriptions.push(disposable);
+    const commandManager = new CommandManager();
+	context.subscriptions.push(commandManager);
+    commandManager.register(new commands.ShowPreviewToSideCommand(previewManager));
+    commandManager.register(new commands.ShowPreviewCommand(previewManager));
+    commandManager.register(new commands.ShowSourceCommand(previewManager));
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {
+
 }
