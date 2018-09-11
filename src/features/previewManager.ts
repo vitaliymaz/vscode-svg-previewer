@@ -7,8 +7,12 @@ export class PreviewManager {
 
     private _activePreview?: Preview;
 
+    constructor(
+        private readonly _extensionPath: string
+    ) {}
+
     public showPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn) {
-        const preview = Preview.create(uri, viewColumn);
+        const preview = Preview.create(uri, viewColumn, this._extensionPath);
         preview.update();
         this.registerPreview(preview);
     }

@@ -10,7 +10,7 @@ export function activate(context: vscode.ExtensionContext) {
     const contentProvider = new SvgContentProvider(context.extensionPath);
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider ('svg-preview', contentProvider));
 
-    const previewManager = new PreviewManager();
+    const previewManager = new PreviewManager(context.extensionPath);
     context.subscriptions.push(previewManager);
 
     const commandManager = new CommandManager();
