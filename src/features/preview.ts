@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
 
 export class Preview {
     private static readonly contentProviderKey = 'svg-preview';
@@ -9,13 +10,13 @@ export class Preview {
 	private readonly _onDidChangeViewStateEmitter = new vscode.EventEmitter<vscode.WebviewPanelOnDidChangeViewStateEvent>();
 	public readonly onDidChangeViewState = this._onDidChangeViewStateEmitter.event;
 
-    public static create(source: vscode.Uri, viewColumn: vscode.ViewColumn) {
+    public static create(source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionPath: string) {
         const panel = vscode.window.createWebviewPanel(
             Preview.contentProviderKey,
             Preview.getPreviewTitle(source.path),
             viewColumn
         );
-        return new Preview(source, panel);
+        return new Preview(source, panel, extensionPath);
     }
 
     private static getPreviewTitle(path: string): string {
@@ -24,8 +25,10 @@ export class Preview {
 
     constructor(
         private _source: vscode.Uri,
-        private _panel: vscode.WebviewPanel
+        private _panel: vscode.WebviewPanel,
+        private readonly _extensionPath: string
     ) {
+        this.setPanelIcon();
         this._panel.onDidChangeViewState(e => {
             this._onDidChangeViewStateEmitter.fire(e);
         });
@@ -53,5 +56,13 @@ export class Preview {
             scheme: Preview.contentProviderKey,
             query: uri.toString()
         });
+    }
+
+    private setPanelIcon() {
+        const root = path.join(this._extensionPath, 'media');
+        this._panel.iconPath = {
+            light: vscode.Uri.file(path.join(root, 'Preview.svg')),
+            dark: vscode.Uri.file(path.join(root, 'Preview_inverse.svg'))
+        };
     }
 }
