@@ -26,12 +26,14 @@ export class Preview {
     constructor(
         private _source: vscode.Uri,
         private _panel: vscode.WebviewPanel,
-        private readonly _extensionPath: string
+        private readonly _extensionPath: string,
     ) {
         this.setPanelIcon();
+        
         this._panel.onDidChangeViewState(e => {
             this._onDidChangeViewStateEmitter.fire(e);
         });
+        
         this._panel.onDidDispose(() => {
             this._onDisposeEmitter.fire();
             this.dispose();
@@ -43,15 +45,15 @@ export class Preview {
     }
 
     public async update() {
-        const doc = await vscode.workspace.openTextDocument(this.normalizeUri(this._source));
+        const doc = await vscode.workspace.openTextDocument(this.withSvgPreviewSchemaUri(this._source));
         this._panel.webview.html = doc.getText();
     }
 
     public dispose() {
-        this._panel.dispose();
+        this._panel.dispose();     
     }
 
-    private normalizeUri(uri: vscode.Uri) {
+    private withSvgPreviewSchemaUri(uri: vscode.Uri) {
         return uri.with({
             scheme: Preview.contentProviderKey,
             query: uri.toString()
