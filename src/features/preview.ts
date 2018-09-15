@@ -1,5 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as nls from 'vscode-nls';
+
+const localize = nls.loadMessageBundle();
 
 export class Preview {
     private static readonly contentProviderKey = 'svg-preview';
@@ -20,11 +23,11 @@ export class Preview {
     }
 
     private static getPreviewTitle(path: string): string {
-        return `Preview ${path.replace(/^.*[\\\/]/, '')}`;
+        return localize('svg.preview.panel.title', 'Preview {0}', path.replace(/^.*[\\\/]/, ''));
     }
 
     constructor(
-        private _source: vscode.Uri,
+        private _resource: vscode.Uri,
         private _panel: vscode.WebviewPanel,
         private readonly _extensionPath: string,
     ) {
@@ -41,12 +44,20 @@ export class Preview {
     }
 
     public get source() {
-        return this._source;
+        return this._resource;
     }
 
-    public async update() {
-        const doc = await vscode.workspace.openTextDocument(this.withSvgPreviewSchemaUri(this._source));
+    public get panel(): vscode.WebviewPanel {
+        return this._panel;
+    }
+
+    public async update(resource?: vscode.Uri) {
+        if (resource) {
+            this._resource = resource;
+        }
+        const doc = await vscode.workspace.openTextDocument(this.withSvgPreviewSchemaUri(this._resource));
         this._panel.webview.html = doc.getText();
+        this._panel.title = Preview.getPreviewTitle(this._resource.fsPath);
     }
 
     public dispose() {
