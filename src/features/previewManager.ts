@@ -16,9 +16,10 @@ export class PreviewManager {
     ) {}
 
     public showPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn) {
-        const preview = Preview.create(uri, viewColumn, this._extensionPath);
-        preview.update();
-        this.registerPreview(preview);
+        const preview =  this.getPreviewOnTargetColumn(viewColumn) || this.createPreview(uri, viewColumn);
+        this._contentProvider.update(uri);
+        preview.update(uri);
+        preview.panel.reveal(preview.panel.viewColumn);
     }
 
     public showSource() {
@@ -30,6 +31,12 @@ export class PreviewManager {
     public dispose(): void {
         this._textChangeWatcherdisposables.forEach(ds => ds.dispose());
         this._previews.forEach(ds => ds.dispose());
+    }
+
+    private createPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn): Preview {
+        const preview = Preview.create(uri, viewColumn, this._extensionPath);
+        this.registerPreview(preview);
+        return preview;
     }
 
     private registerPreview(preview: Preview) {
@@ -65,6 +72,15 @@ export class PreviewManager {
 
     private setSvgPreviewFocusContext(value: boolean) {
         vscode.commands.executeCommand('setContext', PreviewManager.svgPreviewFocusContextKey, value);
+    }
+
+    private getPreviewOnTargetColumn(viewColumn: vscode.ViewColumn): Preview | undefined {
+        const activeViewColumn = vscode.window.activeTextEditor ?
+            vscode.window.activeTextEditor.viewColumn : vscode.ViewColumn.Active;
+
+        return viewColumn === vscode.ViewColumn.Active ?
+            this._previews.find(preview => preview.panel.viewColumn === activeViewColumn): 
+            this._previews.find(preview => preview.panel.viewColumn === <number>activeViewColumn + 1);
     }
     
     private getPreviewOf(resource: vscode.Uri): Preview | undefined {

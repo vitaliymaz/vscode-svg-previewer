@@ -17,10 +17,10 @@
     "contributes": {
         "commands": [
             {
-				"command": "svg.showPreview",
-				"title": "%svg.preview.title%",
-				"category": "Svg"
-			},
+                "command": "svg.showPreview",
+                "title": "%svg.preview.title%",
+                "category": "Svg"
+            },
             {
                 "command": "svg.showPreviewToSide",
                 "title": "%svg.previewSide.title%",
@@ -31,14 +31,14 @@
                 }
             },
             {
-				"command": "svg.showSource",
-				"title": "%svg.showSource.title%",
-				"category": "Svg",
-				"icon": {
-					"light": "./media/ViewSource.svg",
-					"dark": "./media/ViewSource_inverse.svg"
-				}
-			}
+                "command": "svg.showSource",
+                "title": "%svg.showSource.title%",
+                "category": "Svg",
+                "icon": {
+                    "light": "./media/ViewSource.svg",
+                    "dark": "./media/ViewSource_inverse.svg"
+                }
+            }
         ],
         "menus": {
             "editor/title": [
@@ -87,5 +87,8 @@
         "tslint": "^5.8.0",
         "@types/node": "^7.0.43",
         "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "vscode-nls": "^4.0.0"
     }
 }
