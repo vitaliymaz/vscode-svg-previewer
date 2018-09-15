@@ -1,13 +1,17 @@
 import * as vscode from 'vscode';
 
 import { Preview } from './preview';
+import { SvgContentProvider } from './previewContentProvider';
 
 export class PreviewManager {
     private static readonly svgPreviewFocusContextKey = 'svgPreviewFocus';
 
+    private readonly _textChangeWatcherdisposables: vscode.Disposable[] = [];
+    private _previews: Preview[] = [];
     private _activePreview?: Preview;
 
     constructor(
+        private readonly _contentProvider: SvgContentProvider,
         private readonly _extensionPath: string
     ) {}
 
@@ -24,18 +28,29 @@ export class PreviewManager {
     }
 
     public dispose(): void {
-        if (this._activePreview) {
-            this._activePreview.dispose();
-        }
+        this._textChangeWatcherdisposables.forEach(ds => ds.dispose());
+        this._previews.forEach(ds => ds.dispose());
     }
 
     private registerPreview(preview: Preview) {
+        this._previews.push(preview);
         this.onPreviewFocus(preview);
-        preview.onDispose(this.onPreviewBlur.bind(this));
+        preview.onDispose(() => {
+            this.onPreviewBlur();
+            this._previews.splice(this._previews.indexOf(preview), 1);
+        });
     
         preview.onDidChangeViewState(({ webviewPanel }) => {                
             webviewPanel.active ? this.onPreviewFocus(preview) : this.onPreviewBlur();
         });
+        
+        vscode.workspace.onDidChangeTextDocument(event => {
+            const preview = this.getPreviewOf(event.document.uri);
+			if (preview) {
+                this._contentProvider.update(event.document.uri);
+                preview.update();
+			}
+		}, null, this._textChangeWatcherdisposables);
     }
 
     private onPreviewFocus(preview: Preview) {
@@ -51,4 +66,8 @@ export class PreviewManager {
     private setSvgPreviewFocusContext(value: boolean) {
         vscode.commands.executeCommand('setContext', PreviewManager.svgPreviewFocusContextKey, value);
     }
+    
+    private getPreviewOf(resource: vscode.Uri): Preview | undefined {
+        return this._previews.find(p => p.source.fsPath === resource.fsPath);
+	}
 }
