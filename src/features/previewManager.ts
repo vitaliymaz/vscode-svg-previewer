@@ -1,19 +1,23 @@
 import * as vscode from 'vscode';
 
+import { isSvgUri } from '../utils';
 import { Preview } from './preview';
 import { SvgContentProvider } from './previewContentProvider';
 
 export class PreviewManager {
     private static readonly svgPreviewFocusContextKey = 'svgPreviewFocus';
 
-    private readonly _textChangeWatcherdisposables: vscode.Disposable[] = [];
+    private readonly _disposables: vscode.Disposable[] = [];
     private _previews: Preview[] = [];
     private _activePreview?: Preview;
 
     constructor(
         private readonly _contentProvider: SvgContentProvider,
         private readonly _extensionPath: string
-    ) {}
+    ) {        
+        vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this), null, this._disposables);
+        vscode.window.onDidChangeActiveTextEditor(this.onDidChangeActiveTextEditor.bind(this), null, this._disposables);
+    }
 
     public showPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn) {
         const preview =  this.getPreviewOnTargetColumn(viewColumn) || this.createPreview(uri, viewColumn);
@@ -23,14 +27,29 @@ export class PreviewManager {
     }
 
     public showSource() {
-        if (!this._activePreview) { return; }
-        vscode.workspace.openTextDocument(this._activePreview.source)
+        vscode.workspace.openTextDocument(this._activePreview!.source)
             .then(document => vscode.window.showTextDocument(document));
     }
 
     public dispose(): void {
-        this._textChangeWatcherdisposables.forEach(ds => ds.dispose());
+        this._disposables.forEach(ds => ds.dispose());
         this._previews.forEach(ds => ds.dispose());
+    }
+
+    private onDidChangeActiveTextEditor(editor: vscode.TextEditor): void {
+        if (editor && isSvgUri(editor.document.uri)) {
+            this._previews.forEach(preview => {
+                preview.update(editor.document.uri);
+            });
+        }
+    }
+
+    private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent): void {
+        const preview = this.getPreviewOf(event.document.uri);
+		if (preview) {
+            this._contentProvider.update(event.document.uri);
+            preview.update();
+		}
     }
 
     private createPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn): Preview {
@@ -50,14 +69,6 @@ export class PreviewManager {
         preview.onDidChangeViewState(({ webviewPanel }) => {                
             webviewPanel.active ? this.onPreviewFocus(preview) : this.onPreviewBlur();
         });
-        
-        vscode.workspace.onDidChangeTextDocument(event => {
-            const preview = this.getPreviewOf(event.document.uri);
-			if (preview) {
-                this._contentProvider.update(event.document.uri);
-                preview.update();
-			}
-		}, null, this._textChangeWatcherdisposables);
     }
 
     private onPreviewFocus(preview: Preview) {
