@@ -1,6 +1,17 @@
 body {
     height: 100%;
     width: 100%;
+    overflow: hidden;
+    background-position: 0 0,8px 8px;
+    background-size: 16px 16px;
+}
+
+body.vscode-dark {
+    background-image: linear-gradient(45deg,#141414 25%,transparent 0,transparent 75%,#141414 0,#141414),linear-gradient(45deg,#141414 25%,transparent 0,transparent 75%,#141414 0,#141414);
+}
+
+body.vscode-light {
+    background-image: linear-gradient(45deg,#e6e6e6 25%,transparent 0,transparent 75%,#e6e6e6 0,#e6e6e6),linear-gradient(45deg,#e6e6e6 25%,transparent 0,transparent 75%,#e6e6e6 0,#e6e6e6);
 }
 
 img {
