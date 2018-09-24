@@ -1,9 +1,20 @@
-body {
+html, body {
     height: 100%;
     width: 100%;
+}
+
+body {
     overflow: hidden;
     background-position: 0 0,8px 8px;
     background-size: 16px 16px;
+}
+
+body.zoom-in {
+    cursor: zoom-in;
+}
+
+body.zoom-out {
+    cursor: zoom-out;
 }
 
 body.vscode-dark {
@@ -19,4 +30,5 @@ img {
     top: 50%;
     left: 50%;
     transform: translateX(-50%) translateY(-50%);
+    user-select: none;
 }

@@ -17,7 +17,8 @@ export class Preview {
         const panel = vscode.window.createWebviewPanel(
             Preview.contentProviderKey,
             Preview.getPreviewTitle(source.path),
-            viewColumn
+            viewColumn,
+            { enableScripts: true }
         );
         return new Preview(source, panel, extensionPath);
     }

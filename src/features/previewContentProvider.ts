@@ -25,8 +25,9 @@ export class SvgContentProvider implements vscode.TextDocumentContentProvider {
     private getHtml(document: vscode.TextDocument) {
         const base = `<base href="${this.getBaseUrl()}">`;
         const css = `<link rel="stylesheet" type="text/css" href="vscode-resource:styles.css">`;
-        const image = `<img src="data:image/svg+xml,${encodeURIComponent(document.getText())}" />`;
-        return `<!DOCTYPE html><html><head>${base}${css}</head><body>${image}</body></html>`;
+        const image = `<img id="preview-img" src="data:image/svg+xml,${encodeURIComponent(document.getText())}" />`;
+        const script = `<script type="text/javascript" src="vscode-resource:scripts.js"></script>`;
+        return `<!DOCTYPE html><html><head>${base}${css}${script}</head><body>${image}</body></html>`;
     }
 
     private getBaseUrl() {
