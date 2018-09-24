@@ -15,6 +15,8 @@ class ZoomController {
         this.bodyEl.addEventListener('keyup', this.onKeyUp.bind(this));
         this.bodyEl.addEventListener('click', this.onClick.bind(this));
 
+        window.addEventListener('wheel', this.onWheel.bind(this));
+
         this.renderZoomCursor();
     }
 
@@ -24,8 +26,7 @@ class ZoomController {
     }
 
     renderScaledImage() {
-        console.log(`scale: ${this.state.scale}`);
-        this.imageEl.style.transform = `translate(-50%, -50%) scale(${this.state.scale})`;
+        this.imageEl.style.transform = `scale(${this.state.scale}) translate(-50%, -50%)`;
     }
 
     onKeyDown(e) {
@@ -43,12 +44,43 @@ class ZoomController {
     }
 
     onClick() {
-        const nextScale = this.state.zoom === 'in' ? 
-            this.state.scale + this.state.scale * SCALE_STEP : this.state.scale - this.state.scale * SCALE_STEP;
-        if (nextScale >= MIN_SCALE && nextScale <= MAX_SCALE) {
-            this.state.scale = nextScale;
-            this.renderScaledImage();
+        if (this.state.zoom === 'in') {
+            this.zoomIn();
         }
+        if (this.state.zoom === 'out') {
+            this.zoomOut();
+        }
+    }
+
+    onWheel(e) {
+        if (!e.ctrlKey) return;
+        let delta = Math.sign(e.wheelDelta);
+        if (delta === 1) {
+            this.zoomIn();
+        }
+        if (delta === -1) {
+            this.zoomOut();
+        }
+    }
+
+    zoomIn() {
+        const nextScale = this.state.scale + this.state.scale * SCALE_STEP;
+        if (this.isScaleInAvaliableRange(nextScale)) {
+            this.state.scale = nextScale;
+        }
+        this.renderScaledImage();
+    }
+
+    zoomOut() {
+        const nextScale = this.state.scale - this.state.scale * SCALE_STEP;
+        if (this.isScaleInAvaliableRange(nextScale)) {
+            this.state.scale = nextScale;
+        }
+        this.renderScaledImage();
+    }
+
+    isScaleInAvaliableRange(scale) {
+        return scale >= MIN_SCALE && scale <= MAX_SCALE;
     }
 }
 
