@@ -4,7 +4,7 @@ import { isSvgUri } from '../utils';
 import { Preview } from './preview';
 import { SvgContentProvider } from './previewContentProvider';
 
-export class PreviewManager {
+export class PreviewManager implements vscode.WebviewPanelSerializer {
     private static readonly svgPreviewFocusContextKey = 'svgPreviewFocus';
 
     private readonly _disposables: vscode.Disposable[] = [];
@@ -14,7 +14,7 @@ export class PreviewManager {
     constructor(
         private readonly _contentProvider: SvgContentProvider,
         private readonly _extensionPath: string
-    ) {        
+    ) {
         vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this), null, this._disposables);
         vscode.window.onDidChangeActiveTextEditor(this.onDidChangeActiveTextEditor.bind(this), null, this._disposables);
     }
@@ -30,6 +30,17 @@ export class PreviewManager {
         vscode.workspace.openTextDocument(this._activePreview!.source)
             .then(document => vscode.window.showTextDocument(document));
     }
+
+    public async deserializeWebviewPanel(
+		webview: vscode.WebviewPanel,
+		state: any
+	): Promise<void> {
+        const source = vscode.Uri.parse(state.sourceUri);
+        const preview = await Preview.revive(source, webview, this._extensionPath);
+        this.registerPreview(preview);
+        preview.update(source);
+        preview.panel.reveal(preview.panel.viewColumn);
+	}
 
     public dispose(): void {
         this._disposables.forEach(ds => ds.dispose());

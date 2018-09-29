@@ -11,7 +11,8 @@
         "Other"
     ],
     "activationEvents": [
-        "onLanguage:xml"
+        "onLanguage:xml",
+        "onWebviewPanel:svg-preview"
     ],
     "main": "./out/extension",
     "contributes": {

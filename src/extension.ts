@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider ('svg-preview', contentProvider));
 
     const previewManager = new PreviewManager(contentProvider, context.extensionPath);
-    context.subscriptions.push(previewManager);
+    vscode.window.registerWebviewPanelSerializer('svg-preview', previewManager);
 
     const commandManager = new CommandManager();
 	context.subscriptions.push(commandManager);

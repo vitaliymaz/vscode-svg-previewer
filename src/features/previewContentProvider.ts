@@ -18,15 +18,17 @@ export class SvgContentProvider implements vscode.TextDocumentContentProvider {
     }
 
     public provideTextDocumentContent(uri: vscode.Uri): Thenable<string> {
-        return vscode.workspace.openTextDocument(vscode.Uri.parse(uri.query))
-            .then(document => this.getHtml(document));
+        const source = vscode.Uri.parse(uri.query);
+        return vscode.workspace.openTextDocument(source)
+            .then(document => this.getHtml(document, source));
     }
 
-    private getHtml(document: vscode.TextDocument) {
+    private getHtml(document: vscode.TextDocument, resource: vscode.Uri) {
+        const settings = `<meta id="vscode-svg-preview-data" data-source-uri="${resource.toString()}">`;
         const base = `<base href="${this.getBaseUrl()}">`;
         const css = `<link rel="stylesheet" type="text/css" href="vscode-resource:styles.css">`;
         const script = `<script type="text/javascript" src="vscode-resource:scripts.js"></script>`;
-        return `<!DOCTYPE html><html><head>${base}${css}${script}</head><body>${document.getText()}</body></html>`;
+        return `<!DOCTYPE html><html><head>${base}${css}${script}${settings}</head><body>${document.getText()}</body></html>`;
     }
 
     private getBaseUrl() {
