@@ -3,7 +3,9 @@ const MIN_SCALE = 0.2;
 const MAX_SCALE = 6;
 
 class SVGController {
-    static create(svgEl, bodyEl) {
+    static create() {
+        const svgEl = document.querySelector('svg');
+        const bodyEl = document.querySelector('body');
         const hasDefinedDemension = svgEl.hasAttribute('width') && svgEl.hasAttribute('height');
         return hasDefinedDemension ? new SVGWithDemensionController(svgEl, bodyEl) : new SVGWithoutDemensionController(svgEl, bodyEl);
     }
@@ -75,10 +77,23 @@ class SVGWithoutDemensionController extends SVGController {
     }
 }
 
+class StateManager {
+    constructor() {
+        this.vscode = acquireVsCodeApi();
+        this.dataEl = document.getElementById('vscode-svg-preview-data');
+        this.setState(this.dataEl.dataset);
+    }
+
+    setState(state) {
+        this.vscode.setState(state);
+    }
+}
+
 class AppController {
-    constructor(bodyEl, svgController) {
-        this.bodyEl = bodyEl;
-        this.svgController = svgController;
+    constructor() {
+        this.bodyEl = document.querySelector('body');
+        this.svgController = SVGController.create();
+        this.stateManager = new StateManager();
         this.state = { zoom: 'in' };
 
         this.bodyEl.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -130,9 +145,5 @@ class AppController {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    const bodyEl = document.querySelector('body');
-    const svgEl = document.querySelector('svg');
-
-    const svgController = new SVGController(svgEl, bodyEl);
-    const zoomController = new AppController(bodyEl, SVGController.create(svgEl, bodyEl));
+    new AppController();
 });

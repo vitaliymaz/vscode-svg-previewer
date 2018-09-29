@@ -23,6 +23,10 @@ export class Preview {
         return new Preview(source, panel, extensionPath);
     }
 
+    public static revive(source: vscode.Uri, panel: vscode.WebviewPanel, extensionPath: string) {
+        return new Preview(source, panel, extensionPath);
+    }
+
     private static getPreviewTitle(path: string): string {
         return localize('svg.preview.panel.title', 'Preview {0}', path.replace(/^.*[\\\/]/, ''));
     }
