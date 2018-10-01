@@ -1,19 +1,32 @@
 const SCALE_STEP = 0.2;
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 6;
+const WIDTH_REGEXP = new RegExp('(?<=<svg.+width=")(\d+)(?<!.+>)', 'gm');
+const HEIGHT_REGEXP = new RegExp('(?<=<svg.+width=")(\d+)(?<!.+>)', 'gm');
 
 class SVGController {
     static create() {
-        const svgEl = document.querySelector('svg');
-        const bodyEl = document.querySelector('body');
-        const hasDefinedDemension = svgEl.hasAttribute('width') && svgEl.hasAttribute('height');
-        return hasDefinedDemension ? new SVGWithDemensionController(svgEl, bodyEl) : new SVGWithoutDemensionController(svgEl, bodyEl);
+        const sourceData = this.settingsManager.get('sourceData');
+
+        const width = sourceData.match(WIDTH_REGEXP) ? parseInt(sourceData.match(WIDTH_REGEXP)[0]) : null;
+        const height = sourceData.match(HEIGHT_REGEXP) ?  parseInt(sourceData.match(HEIGHT_REGEXP)[0]) : null;
+        const hasDefinedDemension = !!(width && height);
+        
+        return hasDefinedDemension ?
+            new SVGWithDemensionController({ sourceData, width, height }) : 
+            new SVGWithoutDemensionController({ sourceData });
     }
 
-    constructor(svgEl, bodyEl) {
+    constructor() {
+        this.container = document.querySelector('body');
         this.state = { scale: 1 };
-        this.svgEl = svgEl;
-        this.bodyEl = bodyEl;
+    }
+
+    renderImage() {
+        this.image = new Image();
+        const source = `data:image/svg+xml,${encodeURIComponent(this.settingsManager.get('sourceData'))}`;
+        this.image.src = source;
+        this.container.appendChild(this.image);
     }
 
     zoomIn() {
@@ -51,24 +64,26 @@ class SVGController {
 }
 
 class SVGWithDemensionController extends SVGController {
-    constructor(svgEl, bodyEl) {
-        super(svgEl, bodyEl);
-        this.originalDemension = {
-            width: parseInt(this.svgEl.getAttribute('width')),
-            height: parseInt(this.svgEl.getAttribute('height'))
-        };
+    constructor({ sourceData, width, height }) {
+        super(sourceData);
+        this.originalDemension = { width, height };
     }
 }
 
 class SVGWithoutDemensionController extends SVGController {
-    constructor(svgEl, bodyEl) {
-        super(svgEl, bodyEl);
-        const aspectRatio = this.svgEl.viewBox.baseVal.width / this.svgEl.viewBox.baseVal.height;
-        this.originalDemension = {
-            width: this.bodyEl.clientWidth,
-            height: this.bodyEl.clientWidth / aspectRatio,
-        };
-        this.normalizeUndefinedDemensionSvg();
+    constructor({ sourceData }) {
+        super(sourceData);
+        // const aspectRatio = this.svgEl.viewBox.baseVal.width / this.svgEl.viewBox.baseVal.height;
+        // this.originalDemension = {
+        //     width: this.bodyEl.clientWidth,
+        //     height: this.bodyEl.clientWidth / aspectRatio,
+        // };
+        // this.normalizeUndefinedDemensionSvg();
+    }
+
+    renderImage() {
+        super.renderImage();
+
     }
 
     normalizeUndefinedDemensionSvg() {
@@ -77,31 +92,46 @@ class SVGWithoutDemensionController extends SVGController {
     }
 }
 
-class StateManager {
+class SettingsManager {
     constructor() {
         this.vscode = acquireVsCodeApi();
         this.dataEl = document.getElementById('vscode-svg-preview-data');
-        this.setState(this.dataEl.dataset);
+        this.state = {
+            sourceUri: this.dataEl.dataset.sourceUri,
+            sourceData: atob(this.dataEl.dataset.sourceData)
+        };
+        this.persist('sourceUri');
     }
 
-    setState(state) {
-        this.vscode.setState(state);
+    persist(key) {
+        this.vscode.setState({ [key]: this.state[key] });
+    }
+
+    get(key) {
+        return this.state[key];
     }
 }
 
 class AppController {
     constructor() {
+        this.settingsManager = new SettingsManager();
         this.bodyEl = document.querySelector('body');
+        
         this.svgController = SVGController.create();
-        this.stateManager = new StateManager();
-        this.state = { zoom: 'in' };
+        this.svgController.renderImage();
+        
+        // this.state = { zoom: 'in' };
 
-        this.bodyEl.addEventListener('keydown', this.onKeyDown.bind(this));
-        this.bodyEl.addEventListener('keyup', this.onKeyUp.bind(this));
-        this.bodyEl.addEventListener('click', this.onClick.bind(this));
+        // this.bodyEl.addEventListener('keydown', this.onKeyDown.bind(this));
+        // this.bodyEl.addEventListener('keyup', this.onKeyUp.bind(this));
+        // this.bodyEl.addEventListener('click', this.onClick.bind(this));
 
-        window.addEventListener('wheel', this.onWheel.bind(this));
-        this.renderZoomCursor();
+        // window.addEventListener('wheel', this.onWheel.bind(this));
+        // this.renderZoomCursor();
+    }
+
+    renderImage() {
+
     }
 
     renderZoomCursor() {

@@ -24,11 +24,17 @@ export class SvgContentProvider implements vscode.TextDocumentContentProvider {
     }
 
     private getHtml(document: vscode.TextDocument, resource: vscode.Uri) {
-        const settings = `<meta id="vscode-svg-preview-data" data-source-uri="${resource.toString()}">`;
+        const settings = `
+            <meta 
+                id="vscode-svg-preview-data"
+                data-source-uri="${resource.toString()}"
+                data-source-data="${new Buffer(document.getText(), 'binary').toString('base64')}"
+            >
+        `;
         const base = `<base href="${this.getBaseUrl()}">`;
         const css = `<link rel="stylesheet" type="text/css" href="vscode-resource:styles.css">`;
         const script = `<script type="text/javascript" src="vscode-resource:scripts.js"></script>`;
-        return `<!DOCTYPE html><html><head>${base}${css}${script}${settings}</head><body>${document.getText()}</body></html>`;
+        return `<!DOCTYPE html><html><head>${base}${css}${script}${settings}</head><body></body></html>`;
     }
 
     private getBaseUrl() {
