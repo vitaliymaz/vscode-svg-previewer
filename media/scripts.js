@@ -1,15 +1,18 @@
 const SCALE_STEP = 0.2;
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 6;
-const WIDTH_REGEXP = new RegExp('(?<=<svg.+width=")(\d+)(?<!.+>)', 'gm');
-const HEIGHT_REGEXP = new RegExp('(?<=<svg.+width=")(\d+)(?<!.+>)', 'gm');
+const WIDTH_REGEXP = /<svg.+width="([0-9.,]+)/gm;
+const HEIGHT_REGEXP = /<svg.+height="([0-9.,]+)/gm;
 
 class SVGController {
-    static create() {
-        const sourceData = this.settingsManager.get('sourceData');
-
-        const width = sourceData.match(WIDTH_REGEXP) ? parseInt(sourceData.match(WIDTH_REGEXP)[0]) : null;
-        const height = sourceData.match(HEIGHT_REGEXP) ?  parseInt(sourceData.match(HEIGHT_REGEXP)[0]) : null;
+    static create(sourceData) {
+        const width = sourceData.match(WIDTH_REGEXP) ? parseInt(sourceData.match(WIDTH_REGEXP)[2]) : null;
+        const height = sourceData.match(HEIGHT_REGEXP) ?  parseInt(sourceData.match(HEIGHT_REGEXP)[2]) : null;
+        const newSourceData = sourceData.replace(/\r?\n|\r/gm, ' ');
+        console.log(`create ${sourceData}`);
+        console.log(`match 1: ${newSourceData.match(WIDTH_REGEXP)[0]}`);
+        console.log(`match 2: ${newSourceData.match(WIDTH_REGEXP)[1]}`);
+        console.log(`match 3: ${newSourceData.match(WIDTH_REGEXP)[2]}`);
         const hasDefinedDemension = !!(width && height);
         
         return hasDefinedDemension ?
@@ -17,14 +20,15 @@ class SVGController {
             new SVGWithoutDemensionController({ sourceData });
     }
 
-    constructor() {
+    constructor(sourceData) {
+        this.sourceData = sourceData;
         this.container = document.querySelector('body');
         this.state = { scale: 1 };
     }
 
     renderImage() {
         this.image = new Image();
-        const source = `data:image/svg+xml,${encodeURIComponent(this.settingsManager.get('sourceData'))}`;
+        const source = `data:image/svg+xml,${encodeURIComponent(this.sourceData)}`;
         this.image.src = source;
         this.container.appendChild(this.image);
     }
@@ -67,12 +71,14 @@ class SVGWithDemensionController extends SVGController {
     constructor({ sourceData, width, height }) {
         super(sourceData);
         this.originalDemension = { width, height };
+        console.log('with demension');
     }
 }
 
 class SVGWithoutDemensionController extends SVGController {
     constructor({ sourceData }) {
         super(sourceData);
+        console.log('without demension');
         // const aspectRatio = this.svgEl.viewBox.baseVal.width / this.svgEl.viewBox.baseVal.height;
         // this.originalDemension = {
         //     width: this.bodyEl.clientWidth,
@@ -117,7 +123,7 @@ class AppController {
         this.settingsManager = new SettingsManager();
         this.bodyEl = document.querySelector('body');
         
-        this.svgController = SVGController.create();
+        this.svgController = SVGController.create(this.settingsManager.get('sourceData'));
         this.svgController.renderImage();
         
         // this.state = { zoom: 'in' };
