@@ -11,6 +11,7 @@ body {
 
     display: flex;
     align-items: center;
+    flex-direction: column;
 }
 
 body.zoom-in {
@@ -29,7 +30,7 @@ body.vscode-light {
     background-image: linear-gradient(45deg,#e6e6e6 25%,transparent 0,transparent 75%,#e6e6e6 0,#e6e6e6),linear-gradient(45deg,#e6e6e6 25%,transparent 0,transparent 75%,#e6e6e6 0,#e6e6e6);
 }
 
-svg {
+img {
     display: block;
     user-select: none;
     flex-shrink: 0;
