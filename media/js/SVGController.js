@@ -2,15 +2,14 @@ const SCALE_STEP = 0.2;
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 6;
 
-const WIDTH_REGEXP = /<svg.+width=("|')([0-9.,]+)\w*("|').+?>/;
-const HEIGHT_REGEXP = /<svg.+height=("|')([0-9.,]+)\w*("|').+?>/;
+const WIDTH_REGEXP = /<svg.+?width=("|')([0-9.,]+)\w*("|').+?>/;
+const HEIGHT_REGEXP = /<svg.+?height=("|')([0-9.,]+)\w*("|').+?>/;
 const NEW_LINE_REGEXP = /\r?\n|\r/gm;
 
 function getDemension(sourceData) {
     const trimmedSourceData = sourceData.replace(NEW_LINE_REGEXP, ' ');
     const width = trimmedSourceData.match(WIDTH_REGEXP) ? trimmedSourceData.match(WIDTH_REGEXP)[2] : null;
     const height = trimmedSourceData.match(HEIGHT_REGEXP) ? trimmedSourceData.match(HEIGHT_REGEXP)[2] : null;
-
     return width && height ? { width: parseFloat(width), height: parseFloat(width) } : null;
 }
 
