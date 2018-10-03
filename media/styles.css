@@ -11,6 +11,7 @@ body {
 
     display: flex;
     align-items: center;
+    flex-direction: column;
 }
 
 body.zoom-in {

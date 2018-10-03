@@ -33,8 +33,13 @@ export class SvgContentProvider implements vscode.TextDocumentContentProvider {
         `;
         const base = `<base href="${this.getBaseUrl()}">`;
         const css = `<link rel="stylesheet" type="text/css" href="vscode-resource:styles.css">`;
-        const script = `<script type="text/javascript" src="vscode-resource:scripts.js"></script>`;
-        return `<!DOCTYPE html><html><head>${base}${css}${script}${settings}</head><body></body></html>`;
+        const scripts = `
+        <script type="text/javascript" src="vscode-resource:js/SettingsManager.js"></script>
+        <script type="text/javascript" src="vscode-resource:js/SVGController.js"></script>
+        <script type="text/javascript" src="vscode-resource:js/AppController.js"></script>
+        <script type="text/javascript" src="vscode-resource:js/scripts.js"></script>
+        `;
+        return `<!DOCTYPE html><html><head>${base}${css}${scripts}${settings}</head><body></body></html>`;
     }
 
     private getBaseUrl() {
