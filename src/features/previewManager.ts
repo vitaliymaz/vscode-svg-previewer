@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 
 import { isSvgUri } from '../utils';
 import { Preview } from './preview';
-import { SvgContentProvider } from './previewContentProvider';
 
 export class PreviewManager implements vscode.WebviewPanelSerializer {
     private static readonly svgPreviewFocusContextKey = 'svgPreviewFocus';
@@ -12,16 +11,14 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
     private _activePreview?: Preview;
 
     constructor(
-        private readonly _contentProvider: SvgContentProvider,
         private readonly _extensionPath: string
     ) {
         vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this), null, this._disposables);
         vscode.window.onDidChangeActiveTextEditor(this.onDidChangeActiveTextEditor.bind(this), null, this._disposables);
     }
 
-    public showPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn) {
-        const preview =  this.getPreviewOnTargetColumn(viewColumn) || this.createPreview(uri, viewColumn);
-        this._contentProvider.update(uri);
+    public async showPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn) {
+        const preview =  this.getPreviewOnTargetColumn(viewColumn) || await this.createPreview(uri, viewColumn);
         preview.update(uri);
         preview.panel.reveal(preview.panel.viewColumn);
     }
@@ -35,11 +32,9 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
 		webview: vscode.WebviewPanel,
 		state: any
 	): Promise<void> {
-        const source = vscode.Uri.parse(state.sourceUri);
+        const source = vscode.Uri.parse(state.uri);
         const preview = await Preview.revive(source, webview, this._extensionPath);
         this.registerPreview(preview);
-        preview.update(source);
-        preview.panel.reveal(preview.panel.viewColumn);
 	}
 
     public dispose(): void {
@@ -58,13 +53,12 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
     private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent): void {
         const preview = this.getPreviewOf(event.document.uri);
 		if (preview) {
-            this._contentProvider.update(event.document.uri);
             preview.update();
 		}
     }
 
-    private createPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn): Preview {
-        const preview = Preview.create(uri, viewColumn, this._extensionPath);
+    private async createPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn): Promise<Preview> {
+        const preview = await Preview.create(uri, viewColumn, this._extensionPath);
         this.registerPreview(preview);
         return preview;
     }

@@ -1,9 +1,12 @@
 class AppController {
     constructor() {
-        this.settingsManager = new SettingsManager();
+        this.vscode = acquireVsCodeApi();
+
+        this.messageBroker = new MessageBroker();
+        this.messageBroker.on('update-preview', this.updatePreviewSource.bind(this));
+
+
         this.bodyEl = document.querySelector('body');
-        this.svgController = SVGController.create(this.settingsManager.getSourceData());
-        this.svgController.renderImage();
         
         this.state = { zoom: 'in' };
 
@@ -13,6 +16,24 @@ class AppController {
 
         window.addEventListener('wheel', this.onWheel.bind(this));
         this.renderZoomCursor();
+
+        if (this.vscode.getState()) {
+            this.updatePreviewSource(this.vscode.getState());
+        }
+    }
+
+    updatePreviewSource({ uri, data }) {
+        this.vscode.setState({ uri, data });
+        this.renderPreviewImage(data);
+    }
+
+    renderPreviewImage(data) {
+        if (this.svgController) {
+            this.svgController.destroy();
+            this.svgController = null;
+        }
+        this.svgController = SVGController.create(data);
+        this.svgController.renderImage();
     }
 
     renderZoomCursor() {

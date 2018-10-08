@@ -2,6 +2,9 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as nls from 'vscode-nls';
 
+import { withSvgPreviewSchemaUri } from '../utils';
+import { updatePreview } from '../webViewMessaging';
+
 const localize = nls.loadMessageBundle();
 
 export class Preview {
@@ -13,17 +16,21 @@ export class Preview {
 	private readonly _onDidChangeViewStateEmitter = new vscode.EventEmitter<vscode.WebviewPanelOnDidChangeViewStateEvent>();
 	public readonly onDidChangeViewState = this._onDidChangeViewStateEmitter.event;
 
-    public static create(source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionPath: string) {
+    public static async create(source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionPath: string) {
         const panel = vscode.window.createWebviewPanel(
             Preview.contentProviderKey,
             Preview.getPreviewTitle(source.path),
             viewColumn,
             { enableScripts: true }
         );
+        const doc = await vscode.workspace.openTextDocument(withSvgPreviewSchemaUri(source));
+        panel.webview.html = doc.getText();
         return new Preview(source, panel, extensionPath);
     }
 
-    public static revive(source: vscode.Uri, panel: vscode.WebviewPanel, extensionPath: string) {
+    public static async revive(source: vscode.Uri, panel: vscode.WebviewPanel, extensionPath: string) {
+        const doc = await vscode.workspace.openTextDocument(withSvgPreviewSchemaUri(source));
+        panel.webview.html = doc.getText();
         return new Preview(source, panel, extensionPath);
     }
 
@@ -60,8 +67,8 @@ export class Preview {
         if (resource) {
             this._resource = resource;
         }
-        const doc = await vscode.workspace.openTextDocument(this.withSvgPreviewSchemaUri(this._resource));
-        this._panel.webview.html = doc.getText();
+        const message = await this.getUpdateWebViewMessage(this._resource);
+        this._panel.webview.postMessage(message);
         this._panel.title = Preview.getPreviewTitle(this._resource.fsPath);
     }
 
@@ -69,10 +76,11 @@ export class Preview {
         this._panel.dispose();     
     }
 
-    private withSvgPreviewSchemaUri(uri: vscode.Uri) {
-        return uri.with({
-            scheme: Preview.contentProviderKey,
-            query: uri.toString()
+    private async getUpdateWebViewMessage(uri: vscode.Uri) {
+        const document = await vscode.workspace.openTextDocument(uri);
+        return updatePreview({
+            uri: uri.toString(),
+            data: document.getText()
         });
     }
 
