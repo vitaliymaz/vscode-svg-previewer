@@ -36,3 +36,15 @@ img {
     flex-shrink: 0;
     margin: auto;
 }
+
+.error-container {
+    white-space: nowrap;
+    user-select: none;
+    flex-shrink: 0;
+    margin: auto;
+}
+
+.error-container img {
+    float: left;
+    padding-right: 10px;
+}

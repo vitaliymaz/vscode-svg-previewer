@@ -3,7 +3,7 @@ class AppController {
         this.vscode = acquireVsCodeApi();
 
         this.messageBroker = new MessageBroker();
-        this.messageBroker.on('update-preview-source', this.onUpdatePreviewSource.bind(this));
+        this.messageBroker.on('update-preview', this.updatePreviewSource.bind(this));
 
 
         this.bodyEl = document.querySelector('body');
@@ -17,14 +17,12 @@ class AppController {
         window.addEventListener('wheel', this.onWheel.bind(this));
         this.renderZoomCursor();
 
-        console.log('initializing');
-        console.log(this.vscode.getState());
         if (this.vscode.getState()) {
-            this.onUpdatePreviewSource(this.vscode.getState());
+            this.updatePreviewSource(this.vscode.getState());
         }
     }
 
-    onUpdatePreviewSource({ uri, data }) {
+    updatePreviewSource({ uri, data }) {
         this.vscode.setState({ uri, data });
         this.renderPreviewImage(data);
     }

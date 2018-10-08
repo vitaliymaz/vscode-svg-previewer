@@ -35,8 +35,6 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
         const source = vscode.Uri.parse(state.uri);
         const preview = await Preview.revive(source, webview, this._extensionPath);
         this.registerPreview(preview);
-        // preview.update(source);
-        // preview.panel.reveal(preview.panel.viewColumn);
 	}
 
     public dispose(): void {

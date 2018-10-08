@@ -25,6 +25,8 @@ class SVGController {
         this.sourceData = sourceData;
         this.container = document.querySelector('body');
         this.state = { scale: 1 };
+
+        this.renderError = this.renderError.bind(this);
     }
 
     applyImageDemension() {
@@ -32,10 +34,25 @@ class SVGController {
     }
 
     renderImage() {
-        this.image = new Image();
+        this.imageElement = new Image();
+        this.imageElement.addEventListener('error', this.renderError);
         const source = `data:image/svg+xml,${encodeURIComponent(this.sourceData)}`;
-        this.image.src = source;
-        this.container.appendChild(this.image);
+        this.imageElement.src = source;
+        this.container.appendChild(this.imageElement);
+    }
+
+    renderError() {
+        this._destroyImage();
+        this.errorElement = document.createElement('div');
+        this.errorElement.className = 'error-container';
+        this.errorElement.innerHTML = `
+            <img src="vscode-resource:error.png" />
+            <div>
+                <div>Image Not Loaded</div>
+                <div>Try to open it externally to fix format problem</div>
+            </div>
+        `;
+        this.container.appendChild(this.errorElement);
     }
 
     zoomIn() {
@@ -55,7 +72,21 @@ class SVGController {
     }
 
     destroy() {
-        this.image.remove();
+        this._destroyImage();
+        this._destroyError();
+    }
+
+    _destroyImage() {
+        if (this.imageElement) {
+            this.imageElement.removeEventListener('error', this.renderError);
+            this.imageElement.remove();
+        }
+    }
+
+    _destroyError() {
+        if (this.errorElement) {
+            this.errorElement.remove();
+        }
     }
 
     getScaledDemension(scale) {
@@ -78,8 +109,8 @@ class SVGWithDemensionController extends SVGController {
 
     applyImageDemension() {
         const { width, height } = this.getScaledDemension(this.state.scale);
-        this.image.setAttribute('width', width);
-        this.image.setAttribute('height', height);
+        this.imageElement.setAttribute('width', width);
+        this.imageElement.setAttribute('height', height);
     }
 }
 
@@ -91,17 +122,17 @@ class SVGWithoutDemensionController extends SVGController {
 
     normalizeUndefinedDemensionSvg() {
         this.originalDemension = {
-            width: this.image.clientWidth,
-            height: this.image.clientHeight,
+            width: this.imageElement.clientWidth,
+            height: this.imageElement.clientHeight,
         };
         this.applyImageDemension(this.originalDemension);
     }
 
     applyImageDemension({ width, height } = this.getScaledDemension(this.state.scale)) {
-        this.image.setAttribute('width', width);
-        this.image.setAttribute('height', height);
+        this.imageElement.setAttribute('width', width);
+        this.imageElement.setAttribute('height', height);
 
-        this.image.style.minWidth = `${width}px`;
-        this.image.style.minHeight = `${height}px`;
+        this.imageElement.style.minWidth = `${width}px`;
+        this.imageElement.style.minHeight = `${height}px`;
     }
 }

@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as nls from 'vscode-nls';
 
 import { withSvgPreviewSchemaUri } from '../utils';
+import { updatePreview } from '../webViewMessaging';
 
 const localize = nls.loadMessageBundle();
 
@@ -68,8 +69,6 @@ export class Preview {
         }
         const message = await this.getUpdateWebViewMessage(this._resource);
         this._panel.webview.postMessage(message);
-        console.log('sent message');
-        console.log(message);
         this._panel.title = Preview.getPreviewTitle(this._resource.fsPath);
     }
 
@@ -79,13 +78,10 @@ export class Preview {
 
     private async getUpdateWebViewMessage(uri: vscode.Uri) {
         const document = await vscode.workspace.openTextDocument(uri);
-        return {
-            command: 'update-preview-source',
-            payload: {
-                uri: uri.toString(),
-                data: document.getText()
-            }
-        };
+        return updatePreview({
+            uri: uri.toString(),
+            data: document.getText()
+        });
     }
 
     private setPanelIcon() {
