@@ -54,6 +54,10 @@ class SVGController {
         this.applyImageDemension();
     }
 
+    destroy() {
+        this.image.remove();
+    }
+
     getScaledDemension(scale) {
         return {
             width: this.originalDemension.width * scale,
