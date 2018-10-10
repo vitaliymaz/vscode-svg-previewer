@@ -1,6 +1,6 @@
 const SCALE_STEP = 0.1;
 const MIN_SCALE = 0.1;
-const MAX_SCALE = 10;
+const MAX_SCALE = 20;
 
 const SVG_TAG_REGEXP = /<svg.+?>/;
 const WIDTH_REGEXP = /width=("|')([0-9.,]+)\w*("|')/;
@@ -88,16 +88,7 @@ class SVGController {
     }
 
     _destroyError() {
-        if (this.errorElement) {
-            this.errorElement.remove();
-        }
-    }
-
-    getScaledDemension(scale) {
-        return {
-            width: this.originalDemension.width * scale,
-            height: this.originalDemension.height * scale
-        };
+        if (this.errorElement) this.errorElement.remove();
     }
 
     isScaleInAvaliableRange(scale) {
@@ -116,7 +107,8 @@ class SVGWithDemensionController extends SVGController {
     }
 
     applyImageDemension() {
-        const { width, height } = this.getScaledDemension(this.state.scale);
+        const width = this.originalDemension.width * this.state.scale;
+        const height = this.originalDemension.height * this.state.scale;
         this.imageElement.setAttribute('width', width);
         this.imageElement.setAttribute('height', height);
 
@@ -126,23 +118,26 @@ class SVGWithDemensionController extends SVGController {
 }
 
 class SVGWithoutDemensionController extends SVGController {
-    imageDidRender() {
-        setTimeout(() => this.normalizeUndefinedDemensionSvg(), 0);
-    }
-
-    normalizeUndefinedDemensionSvg() {
+    constructor(sourceData) {
+        super(sourceData);
         this.originalDemension = {
-            width: this.imageElement.clientWidth,
-            height: this.imageElement.clientHeight,
+            width: 100, // %
+            height: 100 // %
         };
-        this.applyImageDemension(this.originalDemension);
     }
 
-    applyImageDemension({ width, height } = this.getScaledDemension(this.state.scale)) {
-        this.imageElement.setAttribute('width', width);
-        this.imageElement.setAttribute('height', height);
+    imageDidRender() {
+        this.applyImageDemension();
+    }
 
-        this.imageElement.style.minWidth = `${width}px`;
-        this.imageElement.style.minHeight = `${height}px`;
+    applyImageDemension() {
+        const width = parseInt(this.originalDemension.width * this.state.scale);
+        const height = parseInt(this.originalDemension.height * this.state.scale);
+
+        this.imageElement.setAttribute('width', `${width}%`);
+        this.imageElement.setAttribute('height', `${height}%`);
+        
+        this.imageElement.style.minWidth = `${width}%`;
+        this.imageElement.style.minHeight= `${height}%`;
     }
 }
