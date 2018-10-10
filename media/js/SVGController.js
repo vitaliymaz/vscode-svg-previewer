@@ -39,6 +39,10 @@ class SVGController {
         const source = `data:image/svg+xml,${encodeURIComponent(this.sourceData)}`;
         this.imageElement.src = source;
         this.container.appendChild(this.imageElement);
+
+        if (this.imageDidRender) {
+            this.imageDidRender();
+        }
     }
 
     renderError() {
@@ -107,16 +111,22 @@ class SVGWithDemensionController extends SVGController {
         this.originalDemension = { width, height };
     }
 
+    imageDidRender() {
+        this.applyImageDemension();
+    }
+
     applyImageDemension() {
         const { width, height } = this.getScaledDemension(this.state.scale);
         this.imageElement.setAttribute('width', width);
         this.imageElement.setAttribute('height', height);
+
+        this.imageElement.style.minWidth = `${width}px`;
+        this.imageElement.style.minHeight = `${height}px`;
     }
 }
 
 class SVGWithoutDemensionController extends SVGController {
-    renderImage() {
-        super.renderImage();
+    imageDidRender() {
         setTimeout(() => this.normalizeUndefinedDemensionSvg(), 0);
     }
 
