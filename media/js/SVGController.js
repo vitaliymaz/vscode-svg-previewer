@@ -1,6 +1,6 @@
-const SCALE_STEP = 0.2;
-const MIN_SCALE = 0.2;
-const MAX_SCALE = 6;
+const SCALE_STEP = 0.1;
+const MIN_SCALE = 0.1;
+const MAX_SCALE = 10;
 
 const WIDTH_REGEXP = /<svg.+?width=("|')([0-9.,]+)\w*("|').+?>/;
 const HEIGHT_REGEXP = /<svg.+?height=("|')([0-9.,]+)\w*("|').+?>/;
