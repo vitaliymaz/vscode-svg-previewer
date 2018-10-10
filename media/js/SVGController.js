@@ -2,14 +2,14 @@ const SCALE_STEP = 0.1;
 const MIN_SCALE = 0.1;
 const MAX_SCALE = 10;
 
-const WIDTH_REGEXP = /<svg.+?width=("|')([0-9.,]+)\w*("|').+?>/;
-const HEIGHT_REGEXP = /<svg.+?height=("|')([0-9.,]+)\w*("|').+?>/;
-const NEW_LINE_REGEXP = /\r?\n|\r/gm;
+const SVG_TAG_REGEXP = /<svg.+?>/;
+const WIDTH_REGEXP = /width=("|')([0-9.,]+)\w*("|')/;
+const HEIGHT_REGEXP = /height=("|')([0-9.,]+)\w*("|')/;
 
 function getDemension(sourceData) {
-    const trimmedSourceData = sourceData.replace(NEW_LINE_REGEXP, ' ');
-    const width = trimmedSourceData.match(WIDTH_REGEXP) ? trimmedSourceData.match(WIDTH_REGEXP)[2] : null;
-    const height = trimmedSourceData.match(HEIGHT_REGEXP) ? trimmedSourceData.match(HEIGHT_REGEXP)[2] : null;
+    const svgTag = sourceData.match(SVG_TAG_REGEXP) ? sourceData.match(SVG_TAG_REGEXP)[0] : '';
+    const width = svgTag.match(WIDTH_REGEXP) ? svgTag.match(WIDTH_REGEXP)[2] : null;
+    const height = svgTag.match(HEIGHT_REGEXP) ? svgTag.match(HEIGHT_REGEXP)[2] : null;
     return width && height ? { width: parseFloat(width), height: parseFloat(width) } : null;
 }
 
