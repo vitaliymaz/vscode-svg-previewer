@@ -1,9 +1,9 @@
 {
-    "name": "view-svg-proto",
-    "displayName": "view-svg-proto",
-    "description": "",
+    "name": "vscode-svg-previewer",
+    "displayName": "SVG Previewer",
+    "description": "Show SVG preview to the side panel",
     "version": "0.0.1",
-    "publisher": "Vitalii",
+    "publisher": "Vitalii Mazurenko",
     "engines": {
         "vscode": "^1.26.0"
     },
