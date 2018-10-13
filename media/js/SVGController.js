@@ -37,6 +37,7 @@ class SVGController {
 
     renderImage() {
         this.imageElement = new Image();
+        this.imageElement.setAttribute('alt', '');
         this.imageElement.addEventListener('error', this.renderError);
         const source = `data:image/svg+xml,${encodeURIComponent(this.sourceData)}`;
         this.imageElement.src = source;
