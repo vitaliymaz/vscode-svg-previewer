@@ -7,7 +7,7 @@ const SVG_TAG_REGEXP = /<svg.+?>/;
 const WIDTH_REGEXP = /width=("|')([0-9.,]+)\w*("|')/;
 const HEIGHT_REGEXP = /height=("|')([0-9.,]+)\w*("|')/;
 
-function getDemension(sourceData = '') {
+function getDimension(sourceData = '') {
     const trimmedSourceData = sourceData.replace(NEW_LINE_REGEXP, ' ');
     const svgTag = trimmedSourceData.match(SVG_TAG_REGEXP) ? trimmedSourceData.match(SVG_TAG_REGEXP)[0] : '';
     const width = svgTag.match(WIDTH_REGEXP) ? svgTag.match(WIDTH_REGEXP)[2] : null;
@@ -17,10 +17,10 @@ function getDemension(sourceData = '') {
 
 class SVGController {
     static create(sourceData) {
-        const demension = getDemension(sourceData);
-        return demension ?
-            new SVGWithDemensionController(sourceData, { width: demension.width, height: demension.height }) : 
-            new SVGWithoutDemensionController(sourceData);
+        const dimension = getDimension(sourceData);
+        return dimension ?
+            new SVGWithDimensionController(sourceData, { width: dimension.width, height: dimension.height }) :
+            new SVGWithoutDimensionController(sourceData);
     }
 
     constructor(sourceData) {
@@ -31,7 +31,7 @@ class SVGController {
         this.renderError = this.renderError.bind(this);
     }
 
-    applyImageDemension() {
+    applyImageDimension() {
         throw new Error('Should be overridden in sub-class');
     }
 
@@ -66,7 +66,7 @@ class SVGController {
         if (this.isScaleInAvaliableRange(nextScale)) {
             this.state.scale = nextScale;
         }
-        this.applyImageDemension();
+        this.applyImageDimension();
     }
 
     zoomOut() {
@@ -74,7 +74,7 @@ class SVGController {
         if (this.isScaleInAvaliableRange(nextScale)) {
             this.state.scale = nextScale;
         }
-        this.applyImageDemension();
+        this.applyImageDimension();
     }
 
     destroy() {
@@ -98,19 +98,19 @@ class SVGController {
     }
 }
 
-class SVGWithDemensionController extends SVGController {
+class SVGWithDimensionController extends SVGController {
     constructor(sourceData, { width, height }) {
         super(sourceData);
-        this.originalDemension = { width, height };
+        this.originalDimension = { width, height };
     }
 
     imageDidRender() {
-        this.applyImageDemension();
+        this.applyImageDimension();
     }
 
-    applyImageDemension() {
-        const width = this.originalDemension.width * this.state.scale;
-        const height = this.originalDemension.height * this.state.scale;
+    applyImageDimension() {
+        const width = this.originalDimension.width * this.state.scale;
+        const height = this.originalDimension.height * this.state.scale;
         this.imageElement.setAttribute('width', width);
         this.imageElement.setAttribute('height', height);
 
@@ -119,22 +119,22 @@ class SVGWithDemensionController extends SVGController {
     }
 }
 
-class SVGWithoutDemensionController extends SVGController {
+class SVGWithoutDimensionController extends SVGController {
     constructor(sourceData) {
         super(sourceData);
-        this.originalDemension = {
+        this.originalDimension = {
             width: 100, // %
             height: 100 // %
         };
     }
 
     imageDidRender() {
-        this.applyImageDemension();
+        this.applyImageDimension();
     }
 
-    applyImageDemension() {
-        const width = parseInt(this.originalDemension.width * this.state.scale);
-        const height = parseInt(this.originalDemension.height * this.state.scale);
+    applyImageDimension() {
+        const width = parseInt(this.originalDimension.width * this.state.scale);
+        const height = parseInt(this.originalDimension.height * this.state.scale);
 
         this.imageElement.setAttribute('width', `${width}%`);
         this.imageElement.setAttribute('height', `${height}%`);
