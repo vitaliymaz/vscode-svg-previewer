@@ -3,7 +3,7 @@
     "displayName": "SVG Previewer",
     "description": "Show SVG preview to the side panel",
     "version": "0.0.1",
-    "publisher": "Vitalii Mazurenko",
+    "publisher": "vitaliymaz",
     "engines": {
         "vscode": "^1.26.0"
     },
