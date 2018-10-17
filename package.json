@@ -4,6 +4,7 @@
     "description": "Show SVG preview to the side panel",
     "version": "0.0.1",
     "publisher": "vitaliymaz",
+    "repository": "https://github.com/vitaliymaz/vscode-svg-previewer",
     "engines": {
         "vscode": "^1.26.0"
     },

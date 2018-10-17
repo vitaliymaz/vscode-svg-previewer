@@ -42,17 +42,15 @@ class AppController {
     }
 
     onKeyDown(e) {
-        if (e.which === 17) {
+        if (this.isControlKeyEvent(e)) {
             this.state.zoom = 'out';
             this.renderZoomCursor();
         }
     }
 
     onKeyUp(e) {
-        if (e.which === 17) {
-            this.state.zoom = 'in';
-            this.renderZoomCursor();
-        }
+        this.state.zoom = 'in';
+        this.renderZoomCursor();
     }
 
     onClick() {
@@ -73,5 +71,13 @@ class AppController {
         if (delta === -1) {
             this.svgController.zoomOut();
         }
+    }
+
+    isControlKeyEvent(e) {
+        return this.isMacintosh() ? e.metaKey : e.ctrlKey;
+    }
+
+    isMacintosh() {
+        return navigator.platform.indexOf('Mac') > -1
     }
 }
