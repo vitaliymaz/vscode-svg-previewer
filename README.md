@@ -13,7 +13,7 @@ Preview panel can be opened by click on the menu item or by the command.
 
 ## Zoom
 * Click on the image to **Zoom in**
-* Click with **CTRL** button to **Zoom out**
-* Turn the mouse wheel with **CTRL** to **Zoom in** or **Zoom out** the image
+* Click with **Ctrl** or **Command** button to **Zoom out**
+* Turn the mouse wheel with **Ctrl** or **Command** to **Zoom in** or **Zoom out** the image
 
 ![Workflow](media/zoom-workflow.gif)
