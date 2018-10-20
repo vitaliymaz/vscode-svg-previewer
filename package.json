@@ -2,7 +2,7 @@
     "name": "vscode-svg-previewer",
     "displayName": "SVG Previewer",
     "description": "Show SVG preview to the side panel",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "publisher": "vitaliymaz",
     "repository": "https://github.com/vitaliymaz/vscode-svg-previewer",
     "icon": "logo.png",
