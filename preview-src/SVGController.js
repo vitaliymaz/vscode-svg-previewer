@@ -15,7 +15,7 @@ function getDimension(sourceData = '') {
     return width && height ? { width: parseFloat(width), height: parseFloat(width) } : null;
 }
 
-class SVGController {
+export class SVGController {
     static create(sourceData) {
         const dimension = getDimension(sourceData);
         return dimension ?

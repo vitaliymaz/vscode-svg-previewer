@@ -1,4 +1,7 @@
-class AppController {
+import { MessageBroker } from './MessageBroker';
+import { SVGController } from './SVGController';
+
+export class AppController {
     constructor() {
         this.vscode = acquireVsCodeApi();
 

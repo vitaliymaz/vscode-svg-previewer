@@ -1,4 +1,6 @@
-class MessageBroker extends EventEmitter {
+import { EventEmitter } from './EventEmmiter';
+
+export class MessageBroker extends EventEmitter {
     constructor() {
         super();
         window.addEventListener('message', event => {
