@@ -1,11 +1,8 @@
 import { h, render } from 'preact';
-import * as createStore from 'redux-zero';
+import createStore from 'redux-zero';
 import { Provider } from 'redux-zero/preact';
 
-const store = (createStore as any)({
-  profile: {},
-  items: []
-});
+const store = createStore({});
 
 const Main = () =>  <Provider store={store}><div>Hello World</div></Provider>;
 
