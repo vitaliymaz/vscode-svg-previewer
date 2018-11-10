@@ -1,4 +1,5 @@
 {
+	"extends": ["tslint-react"],
 	"rules": {
 		"no-string-throw": true,
 		"no-unused-expression": true,
@@ -10,7 +11,7 @@
 			"always"
 		],
 		"triple-equals": true,
-		"quotemark": [true, "single"]
+		"quotemark": [true, "single", "jsx-double"]
 	},
 	"defaultSeverity": "warning"
 }

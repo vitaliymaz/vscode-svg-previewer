@@ -1,9 +1,10 @@
 import { h, render } from 'preact';
-import createStore from 'redux-zero';
 import { Provider } from 'redux-zero/preact';
+import App from './App';
+import store from './store';
+import './messaging';
 
-const store = createStore({});
-
-const Main = () =>  <Provider store={store}><div>Hello World</div></Provider>;
-
-render(<Main />, document.querySelector('#root') as HTMLElement);
+render(
+    <Provider store={store}><App /></Provider>,
+    document.querySelector('body') as HTMLElement
+);

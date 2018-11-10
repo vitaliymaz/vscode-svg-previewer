@@ -10,7 +10,7 @@ interface IUpdatePreviewPayload {
 
 export function updatePreview(payload: IUpdatePreviewPayload) : IMessage {
     return {
-        command: 'update-preview',
+        command: 'source:update',
         payload
     };
 }

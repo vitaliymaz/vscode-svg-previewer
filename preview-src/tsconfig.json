@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
+        "module": "es2015",
+        "moduleResolution": "node",
         "target": "es6",
         "allowJs": true,
         "rootDir": ".",
@@ -10,5 +11,8 @@
         "noUnusedLocals": true,
         "jsx": "react",
         "jsxFactory": "h"
-    }
+    },
+    "exclude": [
+        "node_modules"
+    ]
 }
