@@ -4,17 +4,27 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Watch Extension",
             "type": "npm",
-            "script": "watch",
-            "problemMatcher": "$tsc-watch",
+            "script": "extension:watch",
+            "problemMatcher": [
+                "$tsc-watch"
+            ],
+            "isBackground": true
+        },
+        {
+            "label": "Watch Webview",
+            "type": "npm",
+            "script": "webview:watch",
+            "isBackground": true
+        },
+        {
+            "label": "Watch",
+            "dependsOn": [
+                "Watch Extension",
+                "Watch Webview"
+            ],
             "isBackground": true,
-            "presentation": {
-                "reveal": "never"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
         }
     ]
 }

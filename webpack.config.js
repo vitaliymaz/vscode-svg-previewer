@@ -6,7 +6,7 @@ module.exports = {
 		index: path.resolve(__dirname, 'preview-src/index.tsx')
 	},
 	resolve: {
-		extensions: ['.ts', '.tsx']
+		extensions: ['.ts', '.tsx', '.js']
 	},
 	devtool: 'inline-source-map',
 	output: {
