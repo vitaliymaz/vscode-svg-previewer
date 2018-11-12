@@ -13,6 +13,7 @@ html, body {
 
 .toolbar {
     height: 35px;
+    flex-shrink: 0;
     border: 1px solid red;
 }
 
@@ -30,6 +31,14 @@ html, body {
 .preview {
     flex-grow: 1;
     border: 1px solid blue;
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.preview img {
+    margin: auto;
 }
 
 /*

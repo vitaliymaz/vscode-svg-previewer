@@ -16,7 +16,7 @@
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
-            "preLaunchTask": "Watch"
+            "preLaunchTask": "Watch Extension"
         },
         {
             "name": "Extension Tests",
@@ -30,7 +30,7 @@
             "outFiles": [
                 "${workspaceFolder}/out/test/**/*.js"
             ],
-            "preLaunchTask": "Watch"
+            "preLaunchTask": "Watch Extension"
         }
     ]
 }

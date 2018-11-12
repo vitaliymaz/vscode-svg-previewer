@@ -3,11 +3,14 @@ import { connect } from 'redux-zero/preact';
 import messageBroker from './messaging';
 import ToolbarContainer from './containers/ToolbarContainer';
 import PreviewContainer from './containers/PreviewContainer';
-import Store, { actions, ISource } from './store';
+import { actions, ISource, IState } from './store';
 
 interface AppProps {
     updateSource: Function;
-  }
+    source: ISource;
+}
+
+const mapToProps = (state: IState) => ({ source: state.source });
 
 class App extends Component<AppProps> {
     componentDidMount() {
@@ -23,15 +26,13 @@ class App extends Component<AppProps> {
     }
 
     render() {
-        console.log('render');
-        console.log(Store.getState());
         return (
             <div className="layout">
                 <ToolbarContainer />
-                <PreviewContainer />
+                {this.props.source.data && <PreviewContainer source={this.props.source} />}
             </div>
         );
     }
 }
 
-export default connect(null, actions)(App);
+export default connect(mapToProps, actions)(App);

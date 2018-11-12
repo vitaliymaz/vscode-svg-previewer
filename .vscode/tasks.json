@@ -11,20 +11,6 @@
                 "$tsc-watch"
             ],
             "isBackground": true
-        },
-        {
-            "label": "Watch Webview",
-            "type": "npm",
-            "script": "webview:watch",
-            "isBackground": true
-        },
-        {
-            "label": "Watch",
-            "dependsOn": [
-                "Watch Extension",
-                "Watch Webview"
-            ],
-            "isBackground": true,
         }
     ]
 }
