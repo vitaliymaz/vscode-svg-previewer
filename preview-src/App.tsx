@@ -29,7 +29,7 @@ class App extends Component<AppProps> {
         return (
             <div className="layout">
                 <ToolbarContainer />
-                {this.props.source.data && <PreviewContainer source={this.props.source} />}
+                {this.props.source.data && <PreviewContainer/>}
             </div>
         );
     }

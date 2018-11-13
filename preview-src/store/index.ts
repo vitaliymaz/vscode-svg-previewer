@@ -6,7 +6,8 @@ const initialState: IState = {
     source: {
         uri: vscodeApi.getState() ? vscodeApi.getState().uri : null,
         data: vscodeApi.getState() ? vscodeApi.getState().data : null,
-    }
+    },
+    scale: 1
 };
 
 export default createStore(initialState);
