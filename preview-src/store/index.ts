@@ -1,13 +1,11 @@
 import createStore from 'redux-zero';
 import { IState } from './IState';
+import vscodeApi from '../vscode-api';
 
-declare var acquireVsCodeApi: any;
-
-const vscode = acquireVsCodeApi();
 const initialState: IState = {
     source: {
-        uri: vscode.getState() ? vscode.getState().uri : null,
-        data: vscode.getState() ? vscode.getState().data : null,
+        uri: vscodeApi.getState() ? vscodeApi.getState().uri : null,
+        data: vscodeApi.getState() ? vscodeApi.getState().data : null,
     }
 };
 
