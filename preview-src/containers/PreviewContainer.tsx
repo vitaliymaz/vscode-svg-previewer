@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import { connect } from 'redux-zero/preact';
 import { actions, ISource, IState } from '../store';
 import Preview from '../components/Preview';
+import PreviewError from '../components/PreviewError';
 
 type dimension = { width: number, height: number };
 
@@ -13,17 +14,31 @@ interface PreviewContainerProps {
     zoomOut: Function;
 }
 
+interface PreviewContainerState {
+    showPreviewError: boolean;
+}
+
 const NEW_LINE_REGEXP = /[\r\n]+/g;
 const SVG_TAG_REGEXP = /<svg.+?>/;
 const WIDTH_REGEXP = /width=("|')([0-9.,]+)\w*("|')/;
 const HEIGHT_REGEXP = /height=("|')([0-9.,]+)\w*("|')/;
 
-class PreviewContainer extends Component<PreviewContainerProps> {
+class PreviewContainer extends Component<PreviewContainerProps, PreviewContainerState> {
     private imageEl?: HTMLImageElement;
+
+    constructor(props: PreviewContainerProps) {
+        super(props);
+
+        this.state = { showPreviewError: false };
+    }
 
     componentDidMount() {
         this.imageEl!.addEventListener('error', this.onError);
         this.imageEl!.addEventListener('load', this.onLoad);
+    }
+
+    componentWillReceiveProps() {
+        this.setState({ showPreviewError: false });
     }
 
     componentWillUnmount() {
@@ -47,11 +62,11 @@ class PreviewContainer extends Component<PreviewContainerProps> {
     }
 
     onError = () => {
-        console.log('Error');
+        this.setState({ showPreviewError: true });
     }
 
     onLoad = () => {
-        console.log('Load');
+        this.setState({ showPreviewError: false });
     }
 
     getOriginalDimension(data: string): dimension | null {
@@ -80,15 +95,17 @@ class PreviewContainer extends Component<PreviewContainerProps> {
     }
 
     render() {
-        return (
-            <Preview
-                data={this.props.source.data}
-                attachRef={this.attachRef}
-                dimension={this.getScaledDimension()}
-                onWheel={this.onWheel}
-                background={this.props.background}
-            />
-        );
+        return this.state.showPreviewError ?
+            <PreviewError /> :
+            (
+                <Preview
+                    data={this.props.source.data}
+                    attachRef={this.attachRef}
+                    dimension={this.getScaledDimension()}
+                    onWheel={this.onWheel}
+                    background={this.props.background}
+                />
+            );
     }
 }
 
