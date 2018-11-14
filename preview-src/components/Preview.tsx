@@ -3,18 +3,27 @@ import { h, FunctionalComponent, Ref } from 'preact';
 interface PreviewProps {
     data: string;
     attachRef: Ref<HTMLImageElement>;
-    dimension: { width: number, height: number };
+    dimension: { width: number, height: number, units: string };
     onWheel: JSX.WheelEventHandler;
 }
 
-const Preview: FunctionalComponent<PreviewProps> = ({ data, attachRef, dimension: { width, height }, onWheel }) => (
-    <div className="preview" onWheel={onWheel}>
-        <img 
-            src={`data:image/svg+xml,${encodeURIComponent(data)}`}
-            ref={attachRef}
-            style={{ width, minWidth: width, height, minHeight: height }}
-        />
-    </div>
-);
+const Preview: FunctionalComponent<PreviewProps> = ({ data, attachRef, dimension: { width, height, units }, onWheel }) => {
+    const styles = {
+        width: `${width}${units}`,
+        minWidth: `${width}${units}`,
+        height: `${height}${units}`,
+        minHeight: `${height}${units}`
+    };
+    return (
+        <div className="preview" onWheel={onWheel}>
+            <img
+                src={`data:image/svg+xml,${encodeURIComponent(data)}`}
+                ref={attachRef}
+                style={styles}
+                alt=""
+            />
+        </div>
+    );
+};
 
 export default Preview;

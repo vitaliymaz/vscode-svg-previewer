@@ -73,8 +73,13 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
 
         const originalWidth = originalDimension ? originalDimension.width : 100;
         const originalHeight = originalDimension ? originalDimension.height : 100;
+        const units = originalDimension ? 'px' : '%';
 
-        return { width: originalWidth * this.props.scale, height: originalHeight * this.props.scale };
+        return { 
+            width: parseInt((originalWidth * this.props.scale).toString()),
+            height: parseInt((originalHeight * this.props.scale).toString()),
+            units 
+        };
     }
 
     render() {

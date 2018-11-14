@@ -47,7 +47,6 @@ export class Preview {
         
         this._panel.onDidChangeViewState((event: vscode.WebviewPanelOnDidChangeViewStateEvent) => {
             this._onDidChangeViewStateEmitter.fire();
-            if (event.webviewPanel.active) { this.update(); }
         });
         
         this._panel.onDidDispose(() => {

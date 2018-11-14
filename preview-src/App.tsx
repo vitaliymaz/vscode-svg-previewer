@@ -22,6 +22,7 @@ class App extends Component<AppProps> {
     }
 
     onSourceUpdate = (source: ISource) => {
+        console.log('on source update');
         this.props.updateSource(source);
     }
 

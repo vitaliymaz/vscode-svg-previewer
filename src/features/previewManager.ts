@@ -43,8 +43,12 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
         this._previews.forEach(ds => ds.dispose());
     }
 
+    private isActivePreviewUri(uri: vscode.Uri) {
+        return this._activePreview && this._activePreview.source.toString() === uri.toString();
+    }
+
     private onDidChangeActiveTextEditor(editor: vscode.TextEditor): void {
-        if (editor && isSvgUri(editor.document.uri)) {
+        if (editor && isSvgUri(editor.document.uri) && !this.isActivePreviewUri(editor.document.uri)) {
             this._previews.forEach(preview => {
                 preview.update(editor.document.uri);
             });
