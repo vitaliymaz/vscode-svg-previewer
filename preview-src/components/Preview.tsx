@@ -5,9 +5,10 @@ interface PreviewProps {
     attachRef: Ref<HTMLImageElement>;
     dimension: { width: number, height: number, units: string };
     onWheel: JSX.WheelEventHandler;
+    background: string;
 }
 
-const Preview: FunctionalComponent<PreviewProps> = ({ data, attachRef, dimension: { width, height, units }, onWheel }) => {
+const Preview: FunctionalComponent<PreviewProps> = ({ data, attachRef, dimension: { width, height, units }, onWheel, background }) => {
     const styles = {
         width: `${width}${units}`,
         minWidth: `${width}${units}`,
@@ -15,7 +16,7 @@ const Preview: FunctionalComponent<PreviewProps> = ({ data, attachRef, dimension
         minHeight: `${height}${units}`
     };
     return (
-        <div className="preview" onWheel={onWheel}>
+        <div className={`preview ${background}`} onWheel={onWheel}>
             <img
                 src={`data:image/svg+xml,${encodeURIComponent(data)}`}
                 ref={attachRef}

@@ -8,12 +8,9 @@ type dimension = { width: number, height: number };
 interface PreviewContainerProps {
     source: ISource;
     scale: number;
+    background: string;
     zoomIn: Function;
     zoomOut: Function;
-}
-
-interface PreviewContainerState {
-
 }
 
 const NEW_LINE_REGEXP = /[\r\n]+/g;
@@ -21,7 +18,7 @@ const SVG_TAG_REGEXP = /<svg.+?>/;
 const WIDTH_REGEXP = /width=("|')([0-9.,]+)\w*("|')/;
 const HEIGHT_REGEXP = /height=("|')([0-9.,]+)\w*("|')/;
 
-class PreviewContainer extends Component<PreviewContainerProps, PreviewContainerState> {
+class PreviewContainer extends Component<PreviewContainerProps> {
     private imageEl?: HTMLImageElement;
 
     componentDidMount() {
@@ -89,11 +86,12 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
                 attachRef={this.attachRef}
                 dimension={this.getScaledDimension()}
                 onWheel={this.onWheel}
+                background={this.props.background}
             />
         );
     }
 }
 
-const mapToProps = (state: IState) => ({ source: state.source, scale: state.scale });
+const mapToProps = (state: IState) => ({ source: state.source, scale: state.scale, background: state.background });
 
 export default connect(mapToProps, actions)(PreviewContainer);

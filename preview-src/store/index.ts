@@ -7,7 +7,9 @@ const initialState: IState = {
         uri: vscodeApi.getState() ? vscodeApi.getState().uri : null,
         data: vscodeApi.getState() ? vscodeApi.getState().data : null,
     },
-    scale: 1
+    scale: 1,
+    background: document.querySelector('body')!.classList.contains('vscode-dark') ? 'dark' : 'light',
+    fileSize: 0,
 };
 
 export default createStore(initialState);
