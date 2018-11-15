@@ -38,8 +38,10 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
         this.imageEl!.addEventListener('load', this.onLoad);
     }
 
-    componentWillReceiveProps() {
-        this.setState({ showPreviewError: false });
+    componentWillReceiveProps(nextProps: PreviewContainerProps) {
+        if (nextProps.source.data !== this.props.source.data) {
+            this.setState({ showPreviewError: false });
+        }
     }
 
     attachRef = (el: HTMLImageElement) => {
