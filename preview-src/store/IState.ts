@@ -5,5 +5,5 @@ export interface IState {
     source: ISource;
     scale: number;
     background: IBackground;
-    fileSize: number;
+    sourceImageValidity: boolean;
 }

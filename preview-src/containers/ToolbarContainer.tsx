@@ -1,19 +1,26 @@
 import { h, Component } from 'preact';
 import { connect } from 'redux-zero/preact';
 import Toolbar from '../components/Toolbar';
-import { actions } from '../store';
+import { actions, IState, ISource } from '../store';
+import { getByteCountByContent, humanFileSize } from '../utils/fileSize';
 
 interface ToolbarContainerProps {
     changeBackground: Function;
     zoomIn: Function;
     zoomOut: Function;
     zoomReset: Function;
-    fileSize: number;
+    background: string;
+    source: ISource;
+    sourceImageValidity: boolean;
 }
 
 class ToolbarContainer extends Component<ToolbarContainerProps> {
     onChangeBackgroundButtonClick = (e: MouseEvent) => {
         this.props.changeBackground(e.srcElement!.getAttribute('name'));
+    }
+
+    getFileSize() {
+        return this.props.source.data ?  humanFileSize(getByteCountByContent(this.props.source.data)) : '0 B';
     }
 
     render() {
@@ -23,10 +30,14 @@ class ToolbarContainer extends Component<ToolbarContainerProps> {
                 zoomIn={this.props.zoomIn}
                 zoomOut={this.props.zoomOut}
                 zoomReset={this.props.zoomReset}
-                fileSize={this.props.fileSize}
+                fileSize={this.getFileSize()}
+                background={this.props.background}
+                sourceImageValidity={this.props.sourceImageValidity}
             />
         );
     }
 }
 
-export default connect(null, actions)(ToolbarContainer);
+const mapToProps = (state: IState) => ({ background: state.background, source: state.source, sourceImageValidity: state.sourceImageValidity });
+
+export default connect(mapToProps, actions)(ToolbarContainer);

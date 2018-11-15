@@ -12,6 +12,7 @@ interface PreviewContainerProps {
     background: string;
     zoomIn: Function;
     zoomOut: Function;
+    toggleSourceImageValidity: Function;
 }
 
 interface PreviewContainerState {
@@ -41,11 +42,6 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
         this.setState({ showPreviewError: false });
     }
 
-    componentWillUnmount() {
-        this.imageEl!.removeEventListener('error', this.onError);
-        this.imageEl!.removeEventListener('load', this.onLoad);
-    }
-
     attachRef = (el: HTMLImageElement) => {
         this.imageEl = el;
     }
@@ -63,10 +59,12 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
 
     onError = () => {
         this.setState({ showPreviewError: true });
+        this.props.toggleSourceImageValidity(false);
     }
 
     onLoad = () => {
         this.setState({ showPreviewError: false });
+        this.props.toggleSourceImageValidity(true);
     }
 
     getOriginalDimension(data: string): dimension | null {

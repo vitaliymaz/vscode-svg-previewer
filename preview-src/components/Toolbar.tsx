@@ -5,22 +5,26 @@ interface ToolbarProps {
     zoomIn: Function;
     zoomOut: Function;
     zoomReset: Function;
-    fileSize: number;
+    fileSize?: string;
+    background: string;
+    sourceImageValidity: boolean;
 }
 
-const Toolbar: FunctionalComponent<ToolbarProps> = ({ onChangeBackgroundButtonClick, zoomIn, zoomOut, zoomReset, fileSize }) => (
+const Toolbar: FunctionalComponent<ToolbarProps> = ({
+     onChangeBackgroundButtonClick, zoomIn, zoomOut, zoomReset, fileSize, background, sourceImageValidity
+    }) => (
     <div className="toolbar">
-        <ul>
-            <li><button onClick={zoomIn as JSX.MouseEventHandler}>Zoom In</button></li>
-            <li><button onClick={zoomOut as JSX.MouseEventHandler}>Zoom In</button></li>
-            <li><button onClick={zoomReset as JSX.MouseEventHandler}>Reset</button></li>
-        </ul>
-        <ul>
-            <li><button name="dark" onClick={onChangeBackgroundButtonClick}>Dark</button></li>
-            <li><button name="light" onClick={onChangeBackgroundButtonClick}>Light</button></li>
-            <li><button name="transparent" onClick={onChangeBackgroundButtonClick}>None</button></li>
-        </ul>
-        {fileSize}
+        <div className="btn-group">
+            <button disabled={!sourceImageValidity} onClick={zoomIn as JSX.MouseEventHandler}>+</button>
+            <button disabled={!sourceImageValidity} onClick={zoomOut as JSX.MouseEventHandler}>-</button>
+            <button disabled={!sourceImageValidity} onClick={zoomReset as JSX.MouseEventHandler}>1:1</button>
+        </div>
+        <div className="bg-group">
+            <button disabled={!sourceImageValidity} className={`bg dark ${background === 'dark' ? 'selected' : ''}`} name="dark" onClick={onChangeBackgroundButtonClick} />
+            <button disabled={!sourceImageValidity} className={`bg light ${background === 'light' ? 'selected' : ''}`} name="light" onClick={onChangeBackgroundButtonClick} />
+            <button disabled={!sourceImageValidity} className={`bg transparent ${background === 'transparent' ? 'selected' : ''}`} name="transparent" onClick={onChangeBackgroundButtonClick} />
+        </div>
+        <div className="size">{fileSize}</div>
     </div>
 );
 
