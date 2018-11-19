@@ -8,21 +8,67 @@ interface ToolbarProps {
     fileSize?: string;
     background: string;
     sourceImageValidity: boolean;
+    onBtnMouseDown: JSX.MouseEventHandler;
+    onBtnMouseUp: JSX.MouseEventHandler;
+    activeBtn?: string;
 }
 
 const Toolbar: FunctionalComponent<ToolbarProps> = ({
-     onChangeBackgroundButtonClick, zoomIn, zoomOut, zoomReset, fileSize, background, sourceImageValidity
+     onChangeBackgroundButtonClick, zoomIn, zoomOut, zoomReset, fileSize, background, sourceImageValidity, onBtnMouseDown, onBtnMouseUp, activeBtn
     }) => (
     <div className="toolbar">
         <div className="btn-group">
-            <button disabled={!sourceImageValidity} onClick={zoomIn as JSX.MouseEventHandler}>+</button>
-            <button disabled={!sourceImageValidity} onClick={zoomOut as JSX.MouseEventHandler}>-</button>
-            <button disabled={!sourceImageValidity} onClick={zoomReset as JSX.MouseEventHandler}>1:1</button>
+            <button 
+                name="zoom-in"
+                className={`reset-button btn btn-plus ${activeBtn === 'zoom-in'? 'active' : ''}`}
+                disabled={!sourceImageValidity}
+                onClick={zoomIn as JSX.MouseEventHandler}
+                onMouseDown={onBtnMouseDown}
+                onMouseUp={onBtnMouseUp}
+            />
+            <button
+                name="zoom-out"
+                className={`reset-button btn btn-minus ${activeBtn === 'zoom-out'? 'active' : ''}`}
+                disabled={!sourceImageValidity}
+                onClick={zoomOut as JSX.MouseEventHandler}
+                onMouseDown={onBtnMouseDown}
+                onMouseUp={onBtnMouseUp}
+            />
+            <button
+                name="reset"
+                className={`reset-button btn btn-one-to-one ${activeBtn === 'reset'? 'active' : ''}`}
+                disabled={!sourceImageValidity}
+                onClick={zoomReset as JSX.MouseEventHandler}
+                onMouseDown={onBtnMouseDown}
+                onMouseUp={onBtnMouseUp}
+            />
         </div>
+        <div className="separator" />
         <div className="bg-group">
-            <button disabled={!sourceImageValidity} className={`bg dark ${background === 'dark' ? 'selected' : ''}`} name="dark" onClick={onChangeBackgroundButtonClick} />
-            <button disabled={!sourceImageValidity} className={`bg light ${background === 'light' ? 'selected' : ''}`} name="light" onClick={onChangeBackgroundButtonClick} />
-            <button disabled={!sourceImageValidity} className={`bg transparent ${background === 'transparent' ? 'selected' : ''}`} name="transparent" onClick={onChangeBackgroundButtonClick} />
+            <div className={`bg-container ${background === 'dark' ? 'selected' : ''}`}>
+                <button
+                    disabled={!sourceImageValidity}
+                    className="reset-button bg dark"
+                    name="dark"
+                    onClick={onChangeBackgroundButtonClick} 
+                />
+            </div>
+            <div className={`bg-container ${background === 'light' ? 'selected' : ''}`}>
+                <button
+                    disabled={!sourceImageValidity}
+                    className="reset-button bg light"
+                    name="light"
+                    onClick={onChangeBackgroundButtonClick} 
+                />
+            </div>
+            <div className={`bg-container ${background === 'transparent' ? 'selected' : ''}`}>
+                <button
+                    disabled={!sourceImageValidity}
+                    className="reset-button bg transparent"
+                    name="transparent"
+                    onClick={onChangeBackgroundButtonClick} 
+                />
+            </div>
         </div>
         <div className="size">{fileSize}</div>
     </div>

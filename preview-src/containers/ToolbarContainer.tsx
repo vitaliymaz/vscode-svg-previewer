@@ -14,13 +14,26 @@ interface ToolbarContainerProps {
     sourceImageValidity: boolean;
 }
 
-class ToolbarContainer extends Component<ToolbarContainerProps> {
+interface ToolbarContainerState {
+    activeBtn?: string;
+}
+
+class ToolbarContainer extends Component<ToolbarContainerProps, ToolbarContainerState> {
+
     onChangeBackgroundButtonClick = (e: MouseEvent) => {
         this.props.changeBackground(e.srcElement!.getAttribute('name'));
     }
 
     getFileSize() {
         return this.props.source.data ?  humanFileSize(getByteCountByContent(this.props.source.data)) : '0 B';
+    }
+
+    onBtnMouseDown = (e: MouseEvent) => {
+        this.setState({ activeBtn: (e.currentTarget as HTMLButtonElement)!.name });
+    }
+
+    onBtnMouseUp = () => {
+        this.setState({ activeBtn: '' });
     }
 
     render() {
@@ -33,6 +46,9 @@ class ToolbarContainer extends Component<ToolbarContainerProps> {
                 fileSize={this.getFileSize()}
                 background={this.props.background}
                 sourceImageValidity={this.props.sourceImageValidity}
+                onBtnMouseDown={this.onBtnMouseDown}
+                onBtnMouseUp={this.onBtnMouseUp}
+                activeBtn={this.state.activeBtn}
             />
         );
     }
