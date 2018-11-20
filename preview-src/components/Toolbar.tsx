@@ -6,15 +6,13 @@ interface ToolbarProps {
     zoomOut: Function;
     zoomReset: Function;
     fileSize?: string;
-    background: string;
     sourceImageValidity: boolean;
     onBtnMouseDown: JSX.MouseEventHandler;
-    onBtnMouseUp: JSX.MouseEventHandler;
     activeBtn?: string;
 }
 
 const Toolbar: FunctionalComponent<ToolbarProps> = ({
-     onChangeBackgroundButtonClick, zoomIn, zoomOut, zoomReset, fileSize, background, sourceImageValidity, onBtnMouseDown, onBtnMouseUp, activeBtn
+     onChangeBackgroundButtonClick, zoomIn, zoomOut, zoomReset, fileSize, sourceImageValidity, onBtnMouseDown, activeBtn
     }) => (
     <div className="toolbar">
         <div className="btn-group">
@@ -24,7 +22,6 @@ const Toolbar: FunctionalComponent<ToolbarProps> = ({
                 disabled={!sourceImageValidity}
                 onClick={zoomIn as JSX.MouseEventHandler}
                 onMouseDown={onBtnMouseDown}
-                onMouseUp={onBtnMouseUp}
             />
             <button
                 name="zoom-out"
@@ -32,7 +29,6 @@ const Toolbar: FunctionalComponent<ToolbarProps> = ({
                 disabled={!sourceImageValidity}
                 onClick={zoomOut as JSX.MouseEventHandler}
                 onMouseDown={onBtnMouseDown}
-                onMouseUp={onBtnMouseUp}
             />
             <button
                 name="reset"
@@ -40,33 +36,35 @@ const Toolbar: FunctionalComponent<ToolbarProps> = ({
                 disabled={!sourceImageValidity}
                 onClick={zoomReset as JSX.MouseEventHandler}
                 onMouseDown={onBtnMouseDown}
-                onMouseUp={onBtnMouseUp}
             />
         </div>
         <div className="separator" />
         <div className="bg-group">
-            <div className={`bg-container ${background === 'dark' ? 'selected' : ''}`}>
+            <div className={`bg-container ${activeBtn === 'dark' ? 'selected' : ''}`}>
                 <button
                     disabled={!sourceImageValidity}
                     className="reset-button bg dark"
                     name="dark"
-                    onClick={onChangeBackgroundButtonClick} 
+                    onClick={onChangeBackgroundButtonClick}
+                    onMouseDown={onBtnMouseDown}
                 />
             </div>
-            <div className={`bg-container ${background === 'light' ? 'selected' : ''}`}>
+            <div className={`bg-container ${activeBtn === 'light' ? 'selected' : ''}`}>
                 <button
                     disabled={!sourceImageValidity}
                     className="reset-button bg light"
                     name="light"
-                    onClick={onChangeBackgroundButtonClick} 
+                    onClick={onChangeBackgroundButtonClick}
+                    onMouseDown={onBtnMouseDown}
                 />
             </div>
-            <div className={`bg-container ${background === 'transparent' ? 'selected' : ''}`}>
+            <div className={`bg-container ${activeBtn === 'transparent' ? 'selected' : ''}`}>
                 <button
                     disabled={!sourceImageValidity}
                     className="reset-button bg transparent"
                     name="transparent"
-                    onClick={onChangeBackgroundButtonClick} 
+                    onClick={onChangeBackgroundButtonClick}
+                    onMouseDown={onBtnMouseDown}
                 />
             </div>
         </div>

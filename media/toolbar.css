@@ -8,6 +8,10 @@
     align-items: center;
 }
 
+.toolbar button[disabled] {
+    opacity: 0.6;
+}
+
 .toolbar .separator {
     height: 16px;
     border-left: 1px solid var(--vscode-editorGroup-border);
@@ -16,7 +20,7 @@
 }
 
 .toolbar .btn-group {
-    margin-left: 16px;
+    margin-left: 12px;
 }
 
 .toolbar .btn-group .btn {
@@ -66,7 +70,7 @@ body.vscode-light .toolbar .btn-group .btn.btn-one-to-one {
 
 .toolbar .size {
     margin-left: auto;
-    margin-right: 16px;
+    margin-right: 10px;
 }
 
 .toolbar .bg-group {
@@ -116,4 +120,11 @@ body.vscode-light .toolbar .bg.dark {
 
 body.vscode-light .toolbar .bg.light {
     background-image: linear-gradient(45deg,#e6e6e6 25%,transparent 0,transparent 75%,#e6e6e6 0,#e6e6e6),linear-gradient(45deg,#e6e6e6 25%,transparent 0,transparent 75%,#e6e6e6 0,#e6e6e6);
+}
+
+
+@media screen and (max-width: 245px) {
+    .toolbar .size {
+        display: none;
+    }
 }

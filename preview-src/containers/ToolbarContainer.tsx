@@ -9,7 +9,6 @@ interface ToolbarContainerProps {
     zoomIn: Function;
     zoomOut: Function;
     zoomReset: Function;
-    background: string;
     source: ISource;
     sourceImageValidity: boolean;
 }
@@ -19,6 +18,14 @@ interface ToolbarContainerState {
 }
 
 class ToolbarContainer extends Component<ToolbarContainerProps, ToolbarContainerState> {
+
+    componentDidMount() {
+        window.document.addEventListener('mouseup', this.onBtnMouseUp);
+    }
+
+    componentWillUnmount() {
+        window.document.removeEventListener('mouseup', this.onBtnMouseUp);
+    }
 
     onChangeBackgroundButtonClick = (e: MouseEvent) => {
         this.props.changeBackground(e.srcElement!.getAttribute('name'));
@@ -44,16 +51,14 @@ class ToolbarContainer extends Component<ToolbarContainerProps, ToolbarContainer
                 zoomOut={this.props.zoomOut}
                 zoomReset={this.props.zoomReset}
                 fileSize={this.getFileSize()}
-                background={this.props.background}
                 sourceImageValidity={this.props.sourceImageValidity}
                 onBtnMouseDown={this.onBtnMouseDown}
-                onBtnMouseUp={this.onBtnMouseUp}
                 activeBtn={this.state.activeBtn}
             />
         );
     }
 }
 
-const mapToProps = (state: IState) => ({ background: state.background, source: state.source, sourceImageValidity: state.sourceImageValidity });
+const mapToProps = (state: IState) => ({ source: state.source, sourceImageValidity: state.sourceImageValidity });
 
 export default connect(mapToProps, actions)(ToolbarContainer);
