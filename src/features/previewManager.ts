@@ -75,8 +75,8 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
             this.onPreviewBlur();
             this._previews.splice(this._previews.indexOf(preview), 1);
         });
-    
-        preview.onDidChangeViewState(({ webviewPanel }) => {                
+
+        preview.onDidChangeViewState(({ webviewPanel }) => {
             webviewPanel.active ? this.onPreviewFocus(preview) : this.onPreviewBlur();
         });
     }
