@@ -74,6 +74,13 @@
                     "when": "svgPreviewFocus",
                     "group": "navigation"
                 }
+            ],
+            "explorer/context": [
+                {
+                    "command": "svg.showPreview",
+                    "group": "navigation",
+                    "when": "resourceLangId == xml"
+                }
             ]
         }
     },
