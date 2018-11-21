@@ -49,7 +49,8 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
     }
 
     onWheel = (event: WheelEvent) => {
-        if (!event.ctrlKey) { return; }
+        if (!(event.ctrlKey || event.metaKey)) { return; }
+        event.preventDefault();
         let delta = Math.sign(event.wheelDelta);
         if (delta === 1) {
             this.props.zoomIn();
