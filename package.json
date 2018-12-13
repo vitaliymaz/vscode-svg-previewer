@@ -82,6 +82,17 @@
                     "when": "resourceLangId == xml"
                 }
             ]
+        },
+        "configuration": {
+            "type": "object",
+            "title": "SVG Previewer",
+            "properties": {
+                "svg.preview.autoOpen": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%svg.autoOpenPreview.dec%"
+                }
+            }
         }
     },
     "scripts": {

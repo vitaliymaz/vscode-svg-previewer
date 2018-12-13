@@ -1,7 +1,7 @@
 import { IState, ISource, IBackground } from './IState';
 import vscodeApi from '../vscode-api';
 
-const DEFAULT_SCALE_STEP = 0.1;
+const DEFAULT_SCALE_STEP = 0.2;
 const MIN_SCALE = 0.1;
 const MAX_SCALE = 20;
 
