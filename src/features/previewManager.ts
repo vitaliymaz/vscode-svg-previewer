@@ -15,10 +15,16 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
     ) {
         vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this), null, this._disposables);
         vscode.window.onDidChangeActiveTextEditor(this.onDidChangeActiveTextEditor.bind(this), null, this._disposables);
+
+        // check the need to open auto preview on plugin activation,
+        // as vscode.window.onDidChangeActiveTextEditor is not yet registered before the first .svg opened
+        if (vscode.window.activeTextEditor && this.shouldAutoOpenPreviewForEditor(vscode.window.activeTextEditor)) {
+            this.showPreview(vscode.window.activeTextEditor.document.uri, vscode.ViewColumn.Beside);
+        }
     }
 
     public async showPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn) {
-        const preview =  this.getPreviewOnTargetColumn(viewColumn) || await this.createPreview(uri, viewColumn);
+        const preview = this.getPreviewOnTargetColumn(viewColumn) || await this.createPreview(uri, viewColumn);
         preview.update(uri);
         preview.panel.reveal(preview.panel.viewColumn);
     }
@@ -29,14 +35,14 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
     }
 
     public async deserializeWebviewPanel(
-		webview: vscode.WebviewPanel,
-		state: any
-	): Promise<void> {
+        webview: vscode.WebviewPanel,
+        state: any
+    ): Promise<void> {
         const source = vscode.Uri.parse(state.uri);
         const preview = await Preview.revive(source, webview, this._extensionPath);
         this.registerPreview(preview);
         preview.update();
-	}
+    }
 
     public dispose(): void {
         this._disposables.forEach(ds => ds.dispose());
@@ -47,19 +53,25 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
         return this._activePreview && this._activePreview.source.toString() === uri.toString();
     }
 
-    private onDidChangeActiveTextEditor(editor: vscode.TextEditor): void {
-        if (editor && isSvgUri(editor.document.uri) && !this.isActivePreviewUri(editor.document.uri)) {
+    private onDidChangeActiveTextEditor(editor?: vscode.TextEditor): void {
+        if (!editor) { return; }
+
+        if (isSvgUri(editor.document.uri) && !this.isActivePreviewUri(editor.document.uri)) {
             this._previews.forEach(preview => {
                 preview.update(editor.document.uri);
             });
+        }
+
+        if (this.shouldAutoOpenPreviewForEditor(editor)) {
+            this.showPreview(editor.document.uri, vscode.ViewColumn.Beside);
         }
     }
 
     private onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent): void {
         const preview = this.getPreviewOf(event.document.uri);
-		if (preview) {
+        if (preview) {
             preview.update();
-		}
+        }
     }
 
     private async createPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn): Promise<Preview> {
@@ -85,7 +97,7 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
         this._activePreview = preview;
         this.setSvgPreviewFocusContext(true);
     }
-    
+
     private onPreviewBlur() {
         this._activePreview = undefined;
         this.setSvgPreviewFocusContext(false);
@@ -100,11 +112,16 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
             vscode.window.activeTextEditor.viewColumn : vscode.ViewColumn.Active;
 
         return viewColumn === vscode.ViewColumn.Active ?
-            this._previews.find(preview => preview.panel.viewColumn === activeViewColumn): 
+            this._previews.find(preview => preview.panel.viewColumn === activeViewColumn) :
             this._previews.find(preview => preview.panel.viewColumn === <number>activeViewColumn + 1);
     }
-    
+
     private getPreviewOf(resource: vscode.Uri): Preview | undefined {
         return this._previews.find(p => p.source.fsPath === resource.fsPath);
-	}
+    }
+
+    private shouldAutoOpenPreviewForEditor(editor: vscode.TextEditor) : boolean {
+        const isAutoOpen = <boolean>vscode.workspace.getConfiguration('svg').get('preview.autoOpen');
+        return isAutoOpen && isSvgUri(editor.document.uri) && !this.getPreviewOf(editor.document.uri);
+    }
 }

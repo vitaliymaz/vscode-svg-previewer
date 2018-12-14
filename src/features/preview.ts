@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as nls from 'vscode-nls';
 
 import { withSvgPreviewSchemaUri } from '../utils';
-import { updatePreview } from '../webViewMessaging';
+import { IMessage, updatePreview } from '../webViewMessaging';
 
 const localize = nls.loadMessageBundle();
 
@@ -14,7 +14,9 @@ export class Preview {
 	public readonly onDispose = this._onDisposeEmitter.event;
 
 	private readonly _onDidChangeViewStateEmitter = new vscode.EventEmitter<vscode.WebviewPanelOnDidChangeViewStateEvent>();
-	public readonly onDidChangeViewState = this._onDidChangeViewStateEmitter.event;
+    public readonly onDidChangeViewState = this._onDidChangeViewStateEmitter.event;
+
+    private _postponedMessage?: IMessage;
 
     public static async create(source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionPath: string) {
         const panel = vscode.window.createWebviewPanel(
@@ -47,6 +49,11 @@ export class Preview {
         
         this._panel.onDidChangeViewState((event: vscode.WebviewPanelOnDidChangeViewStateEvent) => {
             this._onDidChangeViewStateEmitter.fire(event);
+
+            if (event.webviewPanel.visible && this._postponedMessage) {
+                this.postMessage(this._postponedMessage);
+                delete this._postponedMessage;
+            }
         });
         
         this._panel.onDidDispose(() => {
@@ -67,13 +74,24 @@ export class Preview {
         if (resource) {
             this._resource = resource;
         }
-        const message = await this.getUpdateWebViewMessage(this._resource);
-        this._panel.webview.postMessage(message);
         this._panel.title = Preview.getPreviewTitle(this._resource.fsPath);
+
+        const message = await this.getUpdateWebViewMessage(this._resource);
+        this.postMessage(message);
     }
 
     public dispose() {
         this._panel.dispose();     
+    }
+
+    private postMessage(message: IMessage): void {
+        if (this._panel.visible) {
+            this._panel.webview.postMessage(message);
+        } else {
+            // It is not possible posting messages to hidden web views
+            // So saving the last update and flush it once panel become visible
+            this._postponedMessage = message;
+        }
     }
 
     private async getUpdateWebViewMessage(uri: vscode.Uri) {

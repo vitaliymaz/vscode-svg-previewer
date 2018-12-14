@@ -4,7 +4,7 @@ import Toolbar from '../components/Toolbar';
 import { actions, IState, ISource } from '../store';
 import { getByteCountByContent, humanFileSize } from '../utils/fileSize';
 
-const SCALE_STEP = 0.4;
+const SCALE_STEP = 0.5;
 
 interface ToolbarContainerProps {
     changeBackground: Function;
