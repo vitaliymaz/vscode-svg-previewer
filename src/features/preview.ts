@@ -52,6 +52,7 @@ export class Preview {
 
             if (event.webviewPanel.visible && this._postponedMessage) {
                 this.postMessage(this._postponedMessage);
+                delete this._postponedMessage;
             }
         });
         
