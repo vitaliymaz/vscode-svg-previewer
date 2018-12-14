@@ -1,9 +1,9 @@
-interface IMessage {
+export interface IMessage {
     command: string;
     payload: any;
 }
 
-interface IUpdatePreviewPayload {
+export interface IUpdatePreviewPayload {
     uri: string;
     data: string;
 }
