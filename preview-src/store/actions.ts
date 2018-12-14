@@ -12,11 +12,11 @@ export const actions = () => ({
     },
     zoomIn: (state: IState, step = DEFAULT_SCALE_STEP) => {
         const nextScale = state.scale + state.scale * step;
-        return { ...state, scale: nextScale <= MAX_SCALE ? nextScale : state.scale };
+        return { ...state, scale: nextScale <= MAX_SCALE ? nextScale : MAX_SCALE };
     },
     zoomOut: (state: IState, step = DEFAULT_SCALE_STEP) => {
         const nextScale = state.scale - state.scale * step;
-        return { ...state, scale: nextScale >= MIN_SCALE ? nextScale : state.scale };
+        return { ...state, scale: nextScale >= MIN_SCALE ? nextScale : MIN_SCALE };
     },
     zoomReset: (state: IState) => ({ ...state, scale: 1 }),
     changeBackground: (state: IState, background: IBackground) => ({ ...state, background }),
