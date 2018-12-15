@@ -5,29 +5,32 @@ A Visual Studio Code extension which adds an ability to preview SVG images.
 [![](https://vsmarketplacebadge.apphb.com/rating/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
 
 ## Features:
- - Preview SVG images
- - Change transparency grid color
- - Zooming
- - Automatic open preview option
- - Live preview refresh on source editing
+- Preview SVG images
+- Change transparency grid color
+- Zooming
+- Automatic open preview option
+- Live preview refresh on source editing
 
 
 ## Usage: 
 
 #### To Open Preview:
-    - use editor title menu item
-    - use an appropriate command
-    - use a context menu item
+- use editor title menu item
+- use an appropriate command
+- use a context menu item
+
 ![Workflow](media/open-preview.gif)
 
 #### To Zoom In / Zoom Out
-    - use toolbar buttons
-    - use Ctrl / Cmd + mouse wheel
-    - use a touchpad
+- use toolbar buttons
+- use Ctrl / Cmd + mouse wheel
+- use a touchpad
+
 ![Workflow](media/zoom.gif)
 
 #### To Change background:
-    - use toolbar buttons
+- use toolbar buttons
+
 ![Workflow](media/change-background.gif)
 
 

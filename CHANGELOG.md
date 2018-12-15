@@ -6,3 +6,6 @@
 - [Light preview background option](https://github.com/vitaliymaz/vscode-svg-previewer/issues/13)
 - Add a toolbar (Zoom In / Zoom out / Reset buttons, change background color, image size label)
 - Open preview by context menu option
+
+### 0.2.1
+- Add a setting to open preview automatically 
