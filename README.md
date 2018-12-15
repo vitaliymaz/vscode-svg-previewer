@@ -34,7 +34,7 @@ A Visual Studio Code extension which adds an ability to preview SVG images.
 ![Workflow](media/change-background.gif)
 
 
-#### Commands:
+## Commands:
 
 | Command                        | Description                          |
 |--------------------------------|--------------------------------------|
@@ -43,7 +43,7 @@ A Visual Studio Code extension which adds an ability to preview SVG images.
 | Svg: Show Source               | Open source file of the active preview |
 
 
-### Settings:
+## Settings:
 
 | Property             | Description                              | Default |
 |----------------------|------------------------------------------|---------|
