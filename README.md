@@ -1,15 +1,47 @@
-# SVG Previewer
+A Visual Studio Code extension which adds an ability to preview SVG images.
 
-Show SVG preview to the side from current editor. Supports live preview refresh, zoom by click and mouse wheel.
+[![](https://vsmarketplacebadge.apphb.com/version/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
+[![](https://vsmarketplacebadge.apphb.com/installs/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
+[![](https://vsmarketplacebadge.apphb.com/rating/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
 
-## Open Preview
+## Features:
+ - Preview SVG images
+ - Change transparency grid color
+ - Zooming
+ - Automatic open preview option
+ - Live preview refresh on source editing
+
+
+## Usage: 
+
+#### To Open Preview:
+    - use editor title menu item
+    - use an appropriate command
+    - use a context menu item
 ![Workflow](media/open-preview.gif)
 
-## Zoom
+#### To Zoom In / Zoom Out
+    - use toolbar buttons
+    - use Ctrl / Cmd + mouse wheel
+    - use a touchpad
 ![Workflow](media/zoom.gif)
 
-## Change Background
+#### To Change background:
+    - use toolbar buttons
 ![Workflow](media/change-background.gif)
 
-## Live Editing
-![Workflow](media/live-editing.gif)
+
+#### Commands:
+
+| Command                        | Description                          |
+|--------------------------------|--------------------------------------|
+| Svg: Open Preview              | Open preview to the active view coulmn |
+| Svg: Open Preview to the Side  | Open preview to the side view column |
+| Svg: Show Source               | Open source file of the active preview |
+
+
+### Settings:
+
+| Property             | Description                              | Default |
+|----------------------|------------------------------------------|---------|
+| svg.preview.autoOpen | Open a preview to the side automatically | false   |
