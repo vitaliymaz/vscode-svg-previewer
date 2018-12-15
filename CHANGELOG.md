@@ -7,5 +7,5 @@
 - Add a toolbar (Zoom In / Zoom out / Reset buttons, change background color, image size label)
 - Open preview by context menu option
 
-### 0.2.1
+### 0.3.0
 - Add a setting to open preview automatically 
