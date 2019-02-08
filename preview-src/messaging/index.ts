@@ -6,6 +6,7 @@ class MessageBroker extends EventEmitter {
 
         window.addEventListener('message', event => {
             const { command, payload } = event.data;
+
             this.emit(command, payload);
         });
     }    

@@ -6,6 +6,8 @@ import PreviewError from '../components/PreviewError';
 
 type dimension = { width: number, height: number };
 
+type ChromeWheelEvent = WheelEvent & { wheelDelta: number; };
+
 interface PreviewContainerProps {
     source: ISource;
     scale: number;
@@ -51,7 +53,7 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
     onWheel = (event: WheelEvent) => {
         if (!(event.ctrlKey || event.metaKey)) { return; }
         event.preventDefault();
-        let delta = Math.sign(event.wheelDelta);
+        let delta = Math.sign((event as ChromeWheelEvent).wheelDelta);
         if (delta === 1) {
             this.props.zoomIn();
         }
@@ -105,6 +107,7 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
                     dimension={this.getScaledDimension()}
                     onWheel={this.onWheel}
                     background={this.props.background}
+                    settings={this.props.source.settings}
                 />
             );
     }

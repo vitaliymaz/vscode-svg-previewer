@@ -52,3 +52,30 @@ body.vscode-light .preview.light {
     padding-right: 10px;
     padding-left: 15px;
 }
+
+
+/* Bounding Box */
+
+/* vscode cut 1px from the left/right side of a webview */
+.preview.bounding-box {
+    padding-left: 2px;
+    padding-right: 1px;
+}
+
+.preview.bounding-box img {
+    outline: dashed;
+    outline-width: 1px;
+    outline-offset: -1px;
+}
+
+.preview.dark.bounding-box img,
+body.vscode-dark .preview.transparent.bounding-box img {
+    outline-color: #e6e6e6;
+}
+
+.preview.light.bounding-box img,
+body.light .preview.transparent.bounding-box img {
+    outline-color: #141414;
+}
+
+/* Bounding Box */

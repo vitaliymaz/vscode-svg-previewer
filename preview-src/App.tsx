@@ -7,6 +7,7 @@ import { actions, ISource, IState } from './store';
 
 interface AppProps {
     updateSource: Function;
+    updateSettings: Function;
     source: ISource;
 }
 
@@ -14,15 +15,11 @@ const mapToProps = (state: IState) => ({ source: state.source });
 
 class App extends Component<AppProps> {
     componentDidMount() {
-        messageBroker.addListener('source:update', this.onSourceUpdate);
+        messageBroker.addListener('source:update', this.props.updateSource);
     }
 
     componentWillUnmount() {
-        messageBroker.removeListener('source:update', this.onSourceUpdate);
-    }
-
-    onSourceUpdate = (source: ISource) => {
-        this.props.updateSource(source);
+        messageBroker.removeListener('source:update', this.props.updateSource);
     }
 
     render() {

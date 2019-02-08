@@ -91,6 +91,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "%svg.autoOpenPreview.dec%"
+                },
+                "svg.preview.boundingBox": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "%svg.showSvgBoundingBox.dec%"
                 }
             }
         }

@@ -23,7 +23,10 @@ export class Preview {
             Preview.contentProviderKey,
             Preview.getPreviewTitle(source.path),
             viewColumn,
-            { enableScripts: true }
+            { 
+                enableScripts: true,
+                localResourceRoots: [vscode.Uri.file(path.join(extensionPath, 'media'))]
+            }
         );
         const doc = await vscode.workspace.openTextDocument(withSvgPreviewSchemaUri(source));
         panel.webview.html = doc.getText();
@@ -96,9 +99,11 @@ export class Preview {
 
     private async getUpdateWebViewMessage(uri: vscode.Uri) {
         const document = await vscode.workspace.openTextDocument(uri);
+        const showBoundingBox = <boolean>vscode.workspace.getConfiguration('svg').get('preview.boundingBox');
         return updatePreview({
             uri: uri.toString(),
-            data: document.getText()
+            data: document.getText(),
+            settings: { showBoundingBox }
         });
     }
 
