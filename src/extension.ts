@@ -12,18 +12,6 @@ import { createTelemetryReporter, TelemetryEvents } from './telemetry';
 let telemetryReporter: TelemetryReporter;
 
 export function activate(context: vscode.ExtensionContext) {
-    // telemetryReporter = <TelemetryReporter>{
-    //     sendTelemetryEvent: function(eventName: string, properties?: {
-    //         [key: string]: string;
-    //     }, measurements?: {
-    //         [key: string]: number;
-    //     }) {
-    //         console.log('telemetry', eventName, properties);
-    //     },
-    //     dispose: function() {
-    //         return Promise.resolve();
-    //     }
-    // };
     telemetryReporter = createTelemetryReporter();
 
     telemetryReporter.sendTelemetryEvent(TelemetryEvents.TELEMETRY_EVENT_ACTIVATION);

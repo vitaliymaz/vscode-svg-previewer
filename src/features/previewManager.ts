@@ -43,7 +43,7 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
         state: any
     ): Promise<void> {
         const source = vscode.Uri.parse(state.uri);
-        const preview = await Preview.revive(source, webview, this._extensionPath);
+        const preview = await Preview.revive(source, webview, this._extensionPath, this.telemetryReporter);
         this.registerPreview(preview);
         preview.update();
     }
@@ -80,7 +80,7 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
     }
 
     private async createPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn): Promise<Preview> {
-        const preview = await Preview.create(uri, viewColumn, this._extensionPath);
+        const preview = await Preview.create(uri, viewColumn, this._extensionPath, this.telemetryReporter);
         this.registerPreview(preview);
         return preview;
     }

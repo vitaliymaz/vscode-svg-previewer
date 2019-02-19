@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as nls from 'vscode-nls';
+import TelemetryReporter from 'vscode-extension-telemetry';
 
 import { withSvgPreviewSchemaUri } from '../utils';
 import { IMessage, updatePreview } from '../webViewMessaging';
@@ -18,7 +19,7 @@ export class Preview {
 
     private _postponedMessage?: IMessage;
 
-    public static async create(source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionPath: string) {
+    public static async create(source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionPath: string, telemetryReporter: TelemetryReporter) {
         const panel = vscode.window.createWebviewPanel(
             Preview.contentProviderKey,
             Preview.getPreviewTitle(source.path),
@@ -30,13 +31,13 @@ export class Preview {
         );
         const doc = await vscode.workspace.openTextDocument(withSvgPreviewSchemaUri(source));
         panel.webview.html = doc.getText();
-        return new Preview(source, panel, extensionPath);
+        return new Preview(source, panel, extensionPath, telemetryReporter);
     }
 
-    public static async revive(source: vscode.Uri, panel: vscode.WebviewPanel, extensionPath: string) {
+    public static async revive(source: vscode.Uri, panel: vscode.WebviewPanel, extensionPath: string, telemetryReporter: TelemetryReporter) {
         const doc = await vscode.workspace.openTextDocument(withSvgPreviewSchemaUri(source));
         panel.webview.html = doc.getText();
-        return new Preview(source, panel, extensionPath);
+        return new Preview(source, panel, extensionPath, telemetryReporter);
     }
 
     private static getPreviewTitle(path: string): string {
@@ -47,6 +48,7 @@ export class Preview {
         private _resource: vscode.Uri,
         private _panel: vscode.WebviewPanel,
         private readonly _extensionPath: string,
+        private readonly telemetryReporter: TelemetryReporter
     ) {
         this.setPanelIcon();
         
@@ -62,6 +64,10 @@ export class Preview {
         this._panel.onDidDispose(() => {
             this._onDisposeEmitter.fire();
             this.dispose();
+        });
+
+        this._panel.webview.onDidReceiveMessage(message => {
+            this.telemetryReporter.sendTelemetryEvent(message.payload.eventName, message.payload.properties);
         });
     }
 
