@@ -67,7 +67,9 @@ export class Preview {
         });
 
         this._panel.webview.onDidReceiveMessage(message => {
-            this.telemetryReporter.sendTelemetryEvent(message.payload.eventName, message.payload.properties);
+            if (message.command === 'sendTelemetryEvent') {
+                this.telemetryReporter.sendTelemetryEvent(message.payload.eventName, message.payload.properties);
+            }
         });
     }
 
