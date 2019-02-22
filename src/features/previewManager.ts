@@ -1,7 +1,9 @@
 import * as vscode from 'vscode';
+import TelemetryReporter from 'vscode-extension-telemetry';
 
 import { isSvgUri } from '../utils';
 import { Preview } from './preview';
+import { TelemetryEvents } from '../telemetry';
 
 export class PreviewManager implements vscode.WebviewPanelSerializer {
     private static readonly svgPreviewFocusContextKey = 'svgPreviewFocus';
@@ -11,7 +13,8 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
     private _activePreview?: Preview;
 
     constructor(
-        private readonly _extensionPath: string
+        private readonly _extensionPath: string,
+        private readonly telemetryReporter: TelemetryReporter
     ) {
         vscode.workspace.onDidChangeTextDocument(this.onDidChangeTextDocument.bind(this), null, this._disposables);
         vscode.window.onDidChangeActiveTextEditor(this.onDidChangeActiveTextEditor.bind(this), null, this._disposables);
@@ -19,6 +22,7 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
         // check the need to open auto preview on plugin activation,
         // as vscode.window.onDidChangeActiveTextEditor is not yet registered before the first .svg opened
         if (vscode.window.activeTextEditor && this.shouldAutoOpenPreviewForEditor(vscode.window.activeTextEditor)) {
+            this.logAutoOpenPreviewEvent();
             this.showPreview(vscode.window.activeTextEditor.document.uri, vscode.ViewColumn.Beside);
         }
     }
@@ -39,7 +43,7 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
         state: any
     ): Promise<void> {
         const source = vscode.Uri.parse(state.uri);
-        const preview = await Preview.revive(source, webview, this._extensionPath);
+        const preview = await Preview.revive(source, webview, this._extensionPath, this.telemetryReporter);
         this.registerPreview(preview);
         preview.update();
     }
@@ -63,6 +67,7 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
         }
 
         if (this.shouldAutoOpenPreviewForEditor(editor)) {
+            this.logAutoOpenPreviewEvent();
             this.showPreview(editor.document.uri, vscode.ViewColumn.Beside);
         }
     }
@@ -75,7 +80,7 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
     }
 
     private async createPreview(uri: vscode.Uri, viewColumn: vscode.ViewColumn): Promise<Preview> {
-        const preview = await Preview.create(uri, viewColumn, this._extensionPath);
+        const preview = await Preview.create(uri, viewColumn, this._extensionPath, this.telemetryReporter);
         this.registerPreview(preview);
         return preview;
     }
@@ -123,5 +128,14 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
     private shouldAutoOpenPreviewForEditor(editor: vscode.TextEditor) : boolean {
         const isAutoOpen = <boolean>vscode.workspace.getConfiguration('svg').get('preview.autoOpen');
         return isAutoOpen && isSvgUri(editor.document.uri) && !this.getPreviewOf(editor.document.uri);
+    }
+
+    private logAutoOpenPreviewEvent() {
+        const showBoundingBox = <boolean>vscode.workspace.getConfiguration('svg').get('preview.boundingBox');
+
+        this.telemetryReporter.sendTelemetryEvent(
+            TelemetryEvents.TELEMETRY_EVENT_SHOW_PREVIEW_TO_SIDE,
+            { autoOpen: 'yes', boundingBox: showBoundingBox ? 'yes' : 'no' }
+        );
     }
 }

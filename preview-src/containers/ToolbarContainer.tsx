@@ -3,6 +3,7 @@ import { connect } from 'redux-zero/preact';
 import Toolbar from '../components/Toolbar';
 import { actions, IState, ISource } from '../store';
 import { getByteCountByContent, humanFileSize } from '../utils/fileSize';
+import telemetryReporter from '../messaging/telemetry';
 
 const SCALE_STEP = 0.5;
 
@@ -47,10 +48,12 @@ class ToolbarContainer extends Component<ToolbarContainerProps, ToolbarContainer
 
     zoomIn = () => {
         this.props.zoomIn(SCALE_STEP);
+        telemetryReporter.sendZoomEvent('in', 'toolbar');
     }
 
     zoomOut = () => {
         this.props.zoomOut(SCALE_STEP);
+        telemetryReporter.sendZoomEvent('out', 'toolbar');
     }
 
     render() {
