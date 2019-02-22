@@ -3,6 +3,7 @@ import { connect } from 'redux-zero/preact';
 import { actions, ISource, IState } from '../store';
 import Preview from '../components/Preview';
 import PreviewError from '../components/PreviewError';
+import telemetryReporter from '../messaging/telemetry';
 
 type dimension = { width: number, height: number };
 
@@ -56,9 +57,11 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
         let delta = Math.sign((event as ChromeWheelEvent).wheelDelta);
         if (delta === 1) {
             this.props.zoomIn();
+            telemetryReporter.sendZoomEvent('in', 'mousewheel');
         }
         if (delta === -1) {
             this.props.zoomOut();
+            telemetryReporter.sendZoomEvent('out', 'mousewheel');
         }
     }
 

@@ -4,22 +4,22 @@ const TELEMETRY_EVENT_ZOOM = 'zoom';
 const TELEMETRY_EVENT_CHANGE_BACKGROUND = 'changeBackground';
 
 class TelemetryReporter {
-    sendZoomEvent(type: string) {
+    sendZoomEvent(type: string, source: string) {
         messageBroker.send({
             command: 'sendTelemetryEvent',
             payload: {
                 eventName: TELEMETRY_EVENT_ZOOM,
-                properties: { type }
+                properties: { type, source }
             }
         });
     }
 
-    sendChangeBackgroundEvent(color: string) {
+    sendChangeBackgroundEvent(from: string, to: string) {
         messageBroker.send({
             command: 'sendTelemetryEvent',
             payload: {
                 eventName: TELEMETRY_EVENT_CHANGE_BACKGROUND,
-                properties: { color }
+                properties: { from, to }
             }
         });
     }

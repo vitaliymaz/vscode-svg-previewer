@@ -56,9 +56,10 @@ body.vscode-light .preview.light {
 
 /* Bounding Box */
 
-/* vscode cut 1px from the right side of a webview */
+/* vscode cut 1px from the left/right side of a webview */
 .preview.bounding-box {
-    padding-right: 1px;
+    padding-left: 1px;
+    padding-right: 1px;    
 }
 
 .preview.bounding-box img {

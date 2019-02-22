@@ -12,23 +12,19 @@ export const actions = () => ({
         return { ...state, source, scale: 1 };
     },
     zoomIn: (state: IState, step = DEFAULT_SCALE_STEP) => {
-        telemetryReporter.sendZoomEvent('in');
-
         const nextScale = state.scale + state.scale * step;
         return { ...state, scale: nextScale <= MAX_SCALE ? nextScale : MAX_SCALE };
     },
     zoomOut: (state: IState, step = DEFAULT_SCALE_STEP) => {
-        telemetryReporter.sendZoomEvent('out');
-
         const nextScale = state.scale - state.scale * step;
         return { ...state, scale: nextScale >= MIN_SCALE ? nextScale : MIN_SCALE };
     },
     zoomReset: (state: IState) => {
-        telemetryReporter.sendZoomEvent('reset');
+        telemetryReporter.sendZoomEvent('reset', 'toolbar');
         return { ...state, scale: 1 };
     },
     changeBackground: (state: IState, background: IBackground) => {
-        telemetryReporter.sendChangeBackgroundEvent(background);
+        telemetryReporter.sendChangeBackgroundEvent(state.background, background);
         return { ...state, background };
     },
     toggleSourceImageValidity: (state: IState, validity: boolean) => ({ ...state, sourceImageValidity: validity })
