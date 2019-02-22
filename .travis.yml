@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+- v11.10.0
+before_script:
+- npm install
+- npm i -g vsce
+script:
+- npm test
+deploy:
+- provider: script
+  script: bash scripts/deploy.sh
+  on:
+    branch: master
+    condition: "$TRAVIS_COMMIT_MESSAGE =~ .+\\[ci-publish\\].+"
+env:
+  global:
+    secure: dPIszH2x28xbr2IdimpIxYe7QWm1ihONfCa2NX5wfnG1mRwHRJtv9SZtJpbTKLUhTWtkfv3l6Q0dG5N1b1jTohsNq/Bdw+mS4fsr/e8MKElP0KSRgL4axkXQ4Sn0lJdDN0nwjRzRDvlKSOo6u2n2HFxJx4WRmvtrqWkq4YNwZezljl3XPSIeJJd5sO9fpdjoKoELggsSEnthk8phexXokqrVrySfleve5H305CDt7HmktQ8MlxdG15mbdBfFTEXtJSG5OXmHXWzX5wIZhln5J6D8nFvCx6wxc//Lu6O5pid0lBZLHlboTRombeVNouuZVviio5rSQIU6MGslqOgb9RH5G6omkq82hmHOU/k1YM7uBW1gYF7nB+H30qFTtwM7uV21fm7MdhGy5kQn4RRxzaQJsqAvgQBiGMBhT67vMahRPp/urwGscikD/B6OlKm8upkPYrYPk7HNAPLxx6m6bpN81Z8TzKAachbh/CGB51RuCGUgePfPh6YSS/vde0sROfyVX0Bo9sz27nIUuzEu/HZaQD8zHwaJhsYWMqSjRX+xqO08GRHjzwBEnnHkdTMIZcGmtYYiG3DOqFkDlQGcBvK+ZkB0G+pu7k4Q6++1CDTu/iJgcGJT/We8i5oNjYLHggPzd6+bNESUhNZlq8GEaR72sX4z+ls65awxvKUGv9o=
