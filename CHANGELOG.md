@@ -9,3 +9,7 @@
 
 ### 0.3.0
 - Add a setting to open preview automatically 
+
+### 0.3.2
+- Add a setting to show a bounding box around the image
+- Send telemetry events to collect data about using the extension
