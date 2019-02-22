@@ -1,14 +1,14 @@
 language: node_js
 node_js:
-- v11.10.0
+  v11.10.0
 before_script:
-- npm install
-- npm i -g vsce
+  npm install
+  npm i -g vsce
 script:
-- npm test
+  npm test
 deploy:
   skip_cleanup: true
-- provider: script
+  provider: script
   script: bash scripts/deploy.sh
   on:
     branch: master
