@@ -98,7 +98,21 @@
                     "description": "%svg.showSvgBoundingBox.dec%"
                 }
             }
-        }
+        },
+        "keybindings": [
+			{
+				"command": "svg.showPreview",
+				"key": "shift+ctrl+v",
+				"mac": "shift+cmd+v",
+				"when": "editorLangId == xml"
+			},
+			{
+				"command": "svg.showPreviewToSide",
+				"key": "ctrl+k v",
+				"mac": "cmd+k v",
+				"when": "editorLangId == xml"
+			}
+		]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

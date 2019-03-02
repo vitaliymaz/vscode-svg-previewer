@@ -48,3 +48,11 @@ A Visual Studio Code extension which adds an ability to preview SVG images.
 | Property             | Description                              | Default |
 |----------------------|------------------------------------------|---------|
 | svg.preview.autoOpen | Open a preview to the side automatically | false   |
+
+
+## Keyboard Shortcuts:
+
+| Command                        | Keybinding                          |
+|--------------------------------|--------------------------------------|
+| Svg: Open Preview              | ctrl+shift+v |
+| Svg: Open Preview to the Side  | ctrl+k v |
