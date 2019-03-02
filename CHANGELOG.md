@@ -13,3 +13,6 @@
 ### 0.3.2
 - Add a setting to show a bounding box around the image
 - Send telemetry events to collect data about using the extension
+
+### 0.4.0
+- Add keyboard shortcuts to open preview
