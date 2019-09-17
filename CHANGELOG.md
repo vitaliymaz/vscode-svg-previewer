@@ -17,7 +17,6 @@
 ### 0.4.0
 - Add keyboard shortcuts to open preview
 
-
 ### 0.5.1
 - fix dependencies vulnerabilities
 - improve security policies
