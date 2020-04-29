@@ -20,3 +20,6 @@
 ### 0.5.1
 - fix dependencies vulnerabilities
 - improve security policies
+
+### 0.6.0
+- fix incompatibility with new vscode API

@@ -4,13 +4,13 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Watch Extension",
+            "label": "Compile Extension",
             "type": "npm",
-            "script": "extension:watch",
+            "script": "compile",
             "problemMatcher": [
-                "$tsc-watch"
+                "$tsc"
             ],
-            "isBackground": true
+            "isBackground": false
         }
     ]
 }

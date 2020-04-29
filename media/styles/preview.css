@@ -1,0 +1,88 @@
+.preview {
+    flex-grow: 1;
+
+    display: flex;
+    align-items: center;
+    overflow: auto;
+
+    background-position: 0 0,8px 8px;
+    background-size: 16px 16px;
+}
+
+body.vscode-high-contrast .preview.light,
+body.vscode-dark .preview.light {
+    background-color: var(--svg-previewer-editor-background-light-base);
+}
+
+body.vscode-high-contrast .preview.dark.transparency-grid,
+body.vscode-dark .preview.dark.transparency-grid  {
+    background-image: linear-gradient(45deg,var(--svg-previewer-editor-background-lighter) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-lighter) 0,var(--svg-previewer-editor-background-lighter)),linear-gradient(45deg,var(--svg-previewer-editor-background-lighter) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-lighter) 0,var(--svg-previewer-editor-background-lighter));
+}
+
+body.vscode-high-contrast .preview.light.transparency-grid,
+body.vscode-dark .preview.light.transparency-grid {
+    background-image: linear-gradient(45deg,var(--svg-previewer-editor-background-light-base-darker) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-light-base-darker) 0,var(--svg-previewer-editor-background-light-base-darker)),linear-gradient(45deg,var(--svg-previewer-editor-background-light-base-darker) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-light-base-darker) 0,var(--svg-previewer-editor-background-light-base-darker));
+}
+
+body.vscode-light .preview.dark {
+    background-color: var(--svg-previewer-editor-background-dark-base);
+}
+
+body.vscode-light .preview.light.transparency-grid {
+    background-image: linear-gradient(45deg,var(--svg-previewer-editor-background-darker) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-darker) 0,var(--svg-previewer-editor-background-darker)),linear-gradient(45deg,var(--svg-previewer-editor-background-darker) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-darker) 0,var(--svg-previewer-editor-background-darker));
+}
+
+body.vscode-light .preview.dark.transparency-grid {
+    background-image: linear-gradient(45deg,var(--svg-previewer-editor-background-dark-base-lighter) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-dark-base-lighter) 0,var(--svg-previewer-editor-background-dark-base-lighter)),linear-gradient(45deg,var(--svg-previewer-editor-background-dark-base-lighter) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-dark-base-lighter) 0,var(--svg-previewer-editor-background-dark-base-lighter));
+}
+
+.preview img {
+    margin: auto;
+    user-select: none;
+}
+
+.error-container {
+    white-space: nowrap;
+    user-select: none;
+    flex-shrink: 0;
+    margin: auto;
+    display: flex;
+    align-items: center;
+}
+
+.error-container > div {
+    flex-shrink: 0;
+    padding-right: 15px;
+}
+
+.error-container img {
+    padding-right: 10px;
+    padding-left: 15px;
+}
+
+
+/* Bounding Box */
+
+/* vscode cut 1px from the left/right side of a webview */
+.preview.bounding-box {
+    padding-left: 1px;
+    padding-right: 1px;    
+}
+
+.preview.bounding-box img {
+    outline: dashed;
+    outline-width: 1px;
+    outline-offset: -1px;
+}
+
+.preview.dark.bounding-box img,
+body.vscode-dark .preview.transparent.bounding-box img {
+    outline-color: #e6e6e6;
+}
+
+.preview.light.bounding-box img,
+body.light .preview.transparent.bounding-box img {
+    outline-color: #141414;
+}
+
+/* Bounding Box */
