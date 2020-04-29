@@ -21,9 +21,3 @@ button {
 button[disabled] {
     cursor: auto;
 }
-
-.reset-button {
-    background-color: transparent;
-    outline: none;
-    border: none;
-}

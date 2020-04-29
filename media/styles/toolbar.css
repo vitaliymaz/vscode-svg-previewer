@@ -1,0 +1,101 @@
+.toolbar {
+    height: 40px;
+    flex-shrink: 0;
+    background-color: var(--vscode-tab-activeBackground);
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+}
+
+.toolbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+.toolbar .separator {
+    height: 16px;
+    border-left: 1px solid var(--vscode-editorGroup-border);
+    margin-left: 16px;
+    margin-right: 16px;
+}
+
+.toolbar button[disabled] {
+    opacity: 0.6;
+}
+
+.toolbar .btn-group { display: flex; }
+
+.toolbar .btn-group .btn {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background: none;
+    outline: none;
+    border: none;
+    margin-left: 12px;
+}
+
+.toolbar .btn-group:first-child { margin-left: 16px; }
+
+.toolbar .btn-group .btn:first-child {
+    margin-left: 0;
+}
+
+.toolbar .btn-group .btn.selected {
+    box-shadow: 0px 0px 1px 4px var(--vscode-editorGroup-border);
+}
+
+.toolbar .btn .icon {
+    vertical-align: middle;
+}
+
+.toolbar .btn.active {
+    transform: scale(1.272019649);
+}
+
+.toolbar .btn-group .btn.btn-zoom-reset,
+.toolbar .btn-group .btn.btn-zoom-reset .icon {
+    width: 22px;
+}
+
+/* BG Icons */
+
+.toolbar .btn .icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+    pointer-events: none;
+    color: var(--vscode-icon-foreground);
+    box-sizing: border-box;
+}
+
+.toolbar .bg .icon {
+    border: 1px solid var(--vscode-icon-foreground);
+    border-radius: 1px;
+}
+
+body.vscode-high-contrast .toolbar .bg.dark .icon,
+body.vscode-dark .toolbar .bg.dark .icon {
+    background-color: var(--vscode-editor-background);
+}
+
+body.vscode-high-contrast .toolbar .bg.light .icon,
+body.vscode-dark .toolbar .bg.light .icon {
+    background-color: var(--svg-previewer-editor-background-light-base);
+}
+
+body.vscode-light .toolbar .bg.dark .icon {
+    background-color: var(--svg-previewer-editor-background-dark-base);
+}
+
+body.vscode-light .toolbar .bg.light .icon {
+    background-color: var(--vscode-editor-background);
+}
+
+.toolbar .size {
+    margin-left: auto;
+    flex-shrink: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+}
