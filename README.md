@@ -1,54 +1,37 @@
-A Visual Studio Code extension which adds an ability to preview SVG images.
+# SVG Previewer
 
 [![](https://vsmarketplacebadge.apphb.com/version/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
 [![](https://vsmarketplacebadge.apphb.com/downloads/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
 [![](https://vsmarketplacebadge.apphb.com/rating/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
 
-## Features:
-- Preview SVG images
-- Change transparency grid color
-- Zooming
-- Automatic open preview option
-- Live preview refresh on source editing
+![Workflow](media/preview.gif)
 
+## Preview only (instead of the code editor)
 
-## Usage: 
+In case you want to see SVG preview instead of the source code.
 
-#### To Open Preview:
-- use editor title menu item
-- use an appropriate command
-- use a context menu item
+![Workflow](media/preview-editor.gif)
 
-![Workflow](media/open-preview.gif)
+#### How to setup?
+- Open any SVG image
+- Execute the command "View: Reopen Editor With..." (via Command Palette)
+- Select "Image Viewer" and set it as the default
 
-#### To Zoom In / Zoom Out
-- use toolbar buttons
-- use Ctrl / Cmd + mouse wheel
-- use a touchpad
-
-![Workflow](media/zoom.gif)
-
-#### To Change background:
-- use toolbar buttons
-
-![Workflow](media/change-background.gif)
-
+![Workflow](media/preview-editor-how-to.gif)
 
 ## Commands:
 
 | Command                        | Description                          |
 |--------------------------------|--------------------------------------|
-| Svg: Open Preview              | Open preview to the active view coulmn |
+| Svg: Open Preview              | Open preview to the active view column |
 | Svg: Open Preview to the Side  | Open preview to the side view column |
 | Svg: Show Source               | Open source file of the active preview |
-
 
 ## Settings:
 
 | Property             | Description                              | Default |
 |----------------------|------------------------------------------|---------|
 | svg.preview.autoOpen | Open a preview to the side automatically | false   |
-
 
 ## Keyboard Shortcuts:
 

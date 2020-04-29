@@ -1,10 +1,10 @@
-export type ISettings = { showBoundingBox: boolean };
+export type ISettings = { showBoundingBox: boolean, showTransparencyGrid: boolean };
 export type ISource = { uri: string, data: string, settings: ISettings };
-export type IBackground = 'dark' | 'light' | 'transparent';
+export type IBackground = 'dark' | 'light';
 
 export interface IState {
-    source: ISource;
-    scale: number;
-    background: IBackground;
-    sourceImageValidity: boolean;
+  source: ISource;
+  scale: number;
+  background: IBackground;
+  sourceImageValidity: boolean;
 }

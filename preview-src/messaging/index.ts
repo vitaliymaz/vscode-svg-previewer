@@ -1,26 +1,26 @@
-import { EventEmitter}  from 'events';
+import { EventEmitter } from 'events'
 
-import vscode from '../vscode-api';
+import vscode from '../vscode-api'
 
 export interface IMessage {
-    command: string;
-    payload: any;
+  command: string;
+  payload: any;
 }
 
 class MessageBroker extends EventEmitter {
-    constructor() {
-        super();
+  constructor () {
+    super()
 
-        window.addEventListener('message', event => {
-            const { command, payload } = event.data;
+    window.addEventListener('message', event => {
+      const { command, payload } = event.data
 
-            this.emit(command, payload);
-        });
-    }
+      this.emit(command, payload)
+    })
+  }
 
-    send(message: IMessage) {
-        vscode.postMessage(message);
-    }
+  send (message: IMessage) {
+    vscode.postMessage(message)
+  }
 }
 
-export default new MessageBroker();
+export default new MessageBroker()
