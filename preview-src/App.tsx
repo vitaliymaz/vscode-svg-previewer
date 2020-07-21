@@ -6,8 +6,8 @@ import PreviewContainer from './containers/PreviewContainer';
 import { actions, ISource, IState } from './store';
 
 interface AppProps {
-    updateSource: Function;
-    updateSettings: Function;
+    updateSource: (...args: any[]) => void;
+    updateSettings: (...args: any[]) => void;
     source: ISource;
 }
 
@@ -25,7 +25,9 @@ class App extends Component<AppProps> {
     render() {
         return (
             <div className="layout">
+                {/* @ts-ignore */}
                 <ToolbarContainer />
+                {/* @ts-ignore */}
                 {this.props.source.data && <PreviewContainer/>}
             </div>
         );

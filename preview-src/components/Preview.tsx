@@ -1,11 +1,11 @@
-import { h, FunctionalComponent, Ref } from 'preact';
+import { h, FunctionalComponent, RefCallback } from 'preact';
 
 import { ISettings } from '../store/IState';
 
 interface PreviewProps {
     data: string;
     settings: ISettings;
-    attachRef: Ref<HTMLImageElement>;
+    attachRef: RefCallback<HTMLImageElement>;
     dimension: { width: number, height: number, units: string };
     onWheel: JSX.WheelEventHandler;
     background: string;
@@ -25,6 +25,7 @@ const Preview: FunctionalComponent<PreviewProps> = ({
         height: `${height}${units}`,
         minHeight: `${height}${units}`
     };
+
     return (
         <div className={`preview ${background} ${settings.showBoundingBox? 'bounding-box' : ''}`} onWheel={onWheel}>
             <img

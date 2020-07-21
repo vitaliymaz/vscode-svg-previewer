@@ -3,7 +3,6 @@ import * as path from 'path';
 import * as nls from 'vscode-nls';
 import TelemetryReporter from 'vscode-extension-telemetry';
 
-import { withSvgPreviewSchemaUri } from '../utils';
 import { IMessage, updatePreview } from '../webViewMessaging';
 
 const localize = nls.loadMessageBundle();
@@ -29,14 +28,11 @@ export class Preview {
                 localResourceRoots: [vscode.Uri.file(path.join(extensionPath, 'media'))]
             }
         );
-        const doc = await vscode.workspace.openTextDocument(withSvgPreviewSchemaUri(source));
-        panel.webview.html = doc.getText();
+
         return new Preview(source, panel, extensionPath, telemetryReporter);
     }
 
     public static async revive(source: vscode.Uri, panel: vscode.WebviewPanel, extensionPath: string, telemetryReporter: TelemetryReporter) {
-        const doc = await vscode.workspace.openTextDocument(withSvgPreviewSchemaUri(source));
-        panel.webview.html = doc.getText();
         return new Preview(source, panel, extensionPath, telemetryReporter);
     }
 
@@ -50,6 +46,8 @@ export class Preview {
         private readonly _extensionPath: string,
         private readonly telemetryReporter: TelemetryReporter
     ) {
+        this._panel.webview.html = this.getHtml();
+
         this.setPanelIcon();
         
         this._panel.onDidChangeViewState((event: vscode.WebviewPanelOnDidChangeViewStateEvent) => {
@@ -122,4 +120,23 @@ export class Preview {
             dark: vscode.Uri.file(path.join(root, 'Preview_inverse.svg'))
         };
     }
+
+    private getHtml() {
+      const webview = this._panel.webview;
+      
+      const basePath = vscode.Uri.file(path.join(this._extensionPath, 'media'));
+      const cssPath = vscode.Uri.file(path.join(this._extensionPath, 'media', 'styles.css'));
+      const jsPath = vscode.Uri.file(path.join(this._extensionPath, 'media', 'index.js'));
+
+      const base = `<base href="${webview.asWebviewUri(basePath)}">`;
+      const securityPolicy = `
+          <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src ${webview.cspSource}; img-src ${webview.cspSource} data:; script-src ${webview.cspSource}; style-src ${webview.cspSource};"
+          />
+      `;
+      const css = `<link rel="stylesheet" type="text/css" href="${webview.asWebviewUri(cssPath)}">`;
+      const scripts = `<script type="text/javascript" src="${webview.asWebviewUri(jsPath)}"></script>`;
+      return `<!DOCTYPE html><html><head>${base}${securityPolicy}${css}</head><body>${scripts}</body></html>`;
+  }
 }

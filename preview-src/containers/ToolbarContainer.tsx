@@ -31,7 +31,7 @@ class ToolbarContainer extends Component<ToolbarContainerProps, ToolbarContainer
     }
 
     onChangeBackgroundButtonClick = (e: MouseEvent) => {
-        this.props.changeBackground(e.srcElement!.getAttribute('name'));
+        this.props.changeBackground((e.srcElement as HTMLButtonElement).getAttribute('name'));
     }
 
     getFileSize() {

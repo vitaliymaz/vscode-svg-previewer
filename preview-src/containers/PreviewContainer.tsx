@@ -47,8 +47,10 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
         }
     }
 
-    attachRef = (el: HTMLImageElement) => {
-        this.imageEl = el;
+    attachRef = (el: HTMLImageElement | null) => {
+        if (el) {
+            this.imageEl = el;
+        }
     }
 
     onWheel = (event: WheelEvent) => {

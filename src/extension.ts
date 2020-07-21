@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import TelemetryReporter from 'vscode-extension-telemetry';
 
-import { SvgContentProvider } from './features/previewContentProvider';
 import { PreviewManager } from './features/previewManager';
 
 import { CommandManager } from './commandManager';
@@ -15,9 +14,6 @@ export function activate(context: vscode.ExtensionContext) {
     telemetryReporter = createTelemetryReporter();
 
     telemetryReporter.sendTelemetryEvent(TelemetryEvents.TELEMETRY_EVENT_ACTIVATION);
-
-    const contentProvider = new SvgContentProvider(context.extensionPath);
-    context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider ('svg-preview', contentProvider));
 
     const previewManager = new PreviewManager(context.extensionPath, telemetryReporter);
     vscode.window.registerWebviewPanelSerializer('svg-preview', previewManager);
