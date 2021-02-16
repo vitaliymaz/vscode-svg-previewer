@@ -18,8 +18,12 @@
 - Add keyboard shortcuts to open preview
 
 ### 0.5.1
-- fix dependencies vulnerabilities
-- improve security policies
+- Fix dependencies vulnerabilities
+- Improve security policies
 
 ### 0.6.0
 - fix incompatibility with new vscode API
+
+### 0.7.0
+- Add preview only option
+- Redesign the toolbar
