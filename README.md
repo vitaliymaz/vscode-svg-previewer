@@ -8,7 +8,7 @@
 
 ## Preview only (instead of the code editor)
 
-In case you want to see SVG preview instead of the source code.
+In case you want to see SVG preview by default instead of the source code.
 
 ![Workflow](media/preview-editor.gif)
 
