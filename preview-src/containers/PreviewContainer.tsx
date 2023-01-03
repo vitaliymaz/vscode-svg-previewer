@@ -8,8 +8,6 @@ import telemetryReporter from '../messaging/telemetry'
 import messageBroker from '../messaging'
 import { debounce } from '../utils/debounce'
 
-type dimension = { width: number, height: number };
-
 type ChromeWheelEvent = WheelEvent & { wheelDelta: number; };
 
 interface PreviewContainerProps {
@@ -25,11 +23,6 @@ interface PreviewContainerProps {
 interface PreviewContainerState {
   showPreviewError: boolean;
 }
-
-const NEW_LINE_REGEXP = /[\r\n]+/g
-const SVG_TAG_REGEXP = /<svg.+?>/
-const WIDTH_REGEXP = /width=("|')([0-9.,]+)\w*("|')/
-const HEIGHT_REGEXP = /height=("|')([0-9.,]+)\w*("|')/
 
 const COLOR_LIGHT_BASE = '#ffffff'
 const COLOR_DARK_BASE = '#1e1e1e'
@@ -48,8 +41,8 @@ const EDITOR_BACKGROUND_OFFSET = 30
 
 class PreviewContainer extends Component<PreviewContainerProps, PreviewContainerState> {
   private imageEl?: HTMLImageElement;
-  zoomInTelemetryDebounced: Function;
-  zoomOutTelemetryDebounced: Function;
+  sendZoomInTelemetryDebounced: Function;
+  sendZoomOutTelemetryDebounced: Function;
 
   constructor (props: PreviewContainerProps) {
     super(props)
@@ -112,11 +105,11 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
     const delta = Math.sign((event as ChromeWheelEvent).wheelDelta)
     if (delta === 1) {
       this.props.zoomIn()
-      this.zoomInTelemetryDebounced()
+      this.sendZoomInTelemetryDebounced()
     }
     if (delta === -1) {
       this.props.zoomOut()
-      this.zoomOutTelemetryDebounced()
+      this.sendZoomOutTelemetryDebounced()
     }
   }
 
@@ -130,19 +123,8 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
     this.props.toggleSourceImageValidity(true)
   }
 
-  getOriginalDimension (data: string): dimension | null {
-    const formatted = data.replace(NEW_LINE_REGEXP, ' ')
-    const svg = formatted.match(SVG_TAG_REGEXP)
-    let width = null; let height = null
-    if (svg && svg.length) {
-      width = svg[0].match(WIDTH_REGEXP) ? svg[0].match(WIDTH_REGEXP)![2] : null
-      height = svg[0].match(HEIGHT_REGEXP) ? svg[0].match(HEIGHT_REGEXP)![2] : null
-    }
-    return width && height ? { width: parseFloat(width), height: parseFloat(width) } : null
-  }
-
   getScaledDimension () {
-    const originalDimension = this.getOriginalDimension(this.props.source.data)
+    const originalDimension = this.props.source.data.dimension
 
     const originalWidth = originalDimension ? originalDimension.width : 100
     const originalHeight = originalDimension ? originalDimension.height : 100

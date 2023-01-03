@@ -2,7 +2,6 @@ import { h, Component } from 'preact'
 import { connect } from 'redux-zero/preact'
 import Toolbar from '../components/Toolbar'
 import { actions, IState, ISource } from '../store'
-import { getByteCountByContent, humanFileSize } from '../utils/fileSize'
 import telemetryReporter from '../messaging/telemetry'
 import messagingCommands from '../messaging/commands'
 
@@ -51,7 +50,7 @@ class ToolbarContainer extends Component<ToolbarContainerProps, ToolbarContainer
   }
 
   getFileSize () {
-    return this.props.source.data ? humanFileSize(getByteCountByContent(this.props.source.data)) : '0 B'
+    return this.props.source.data ? this.props.source.data.filesize : '0 B'
   }
 
   handleBtnMouseDown = (e: MouseEvent) => {

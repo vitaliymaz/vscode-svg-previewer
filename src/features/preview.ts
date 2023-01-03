@@ -5,6 +5,8 @@ import TelemetryReporter from 'vscode-extension-telemetry'
 
 import { IMessage, updatePreview, activeColorThemeChanged } from '../webViewMessaging'
 import { TELEMETRY_EVENT_TOGGLE_BOUNDING_BOX, TELEMETRY_EVENT_TOGGLE_TRANSPARENCY_GRID } from '../telemetry/events'
+import { getOriginalDimension } from '../utils/originalDimensions'
+import { getByteCountByContent, humanFileSize } from '../utils/fileSize'
 
 const localize = nls.loadMessageBundle()
 
@@ -120,12 +122,15 @@ export class Preview {
 
   private async getUpdateWebViewMessage (uri: vscode.Uri) {
     const document = await vscode.workspace.openTextDocument(uri)
+    const text = document.getText()
+    const dimension = text ? getOriginalDimension(text) : null
+    const filesize = text ? humanFileSize(getByteCountByContent(text)) : null
     const showBoundingBox = <boolean>vscode.workspace.getConfiguration('svg').get('preview.boundingBox')
     const showTransparencyGrid = <boolean>vscode.workspace.getConfiguration('svg').get('preview.transparencyGrid')
 
     return updatePreview({
       uri: uri.toString(),
-      data: document.getText(),
+      data: { dimension, filesize, text },
       settings: { showBoundingBox, showTransparencyGrid }
     })
   }
