@@ -138,7 +138,7 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
       width = svg[0].match(WIDTH_REGEXP) ? svg[0].match(WIDTH_REGEXP)![2] : null
       height = svg[0].match(HEIGHT_REGEXP) ? svg[0].match(HEIGHT_REGEXP)![2] : null
     }
-    return width && height ? { width: parseFloat(width), height: parseFloat(width) } : null
+    return width && height ? { width: parseFloat(width), height: parseFloat(height) } : null
   }
 
   getScaledDimension () {
