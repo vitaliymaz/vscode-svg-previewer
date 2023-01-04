@@ -13,7 +13,7 @@ import {
 } from '../telemetry/events'
 
 export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
-	public static readonly viewType = 'svgPreviewer.customEditor';
+  public static readonly viewType = 'svgPreviewer.customEditor';
 
   private static readonly emptySvgDataUri = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMSIgd2lkdGg9IjEiPjwvc3ZnPg==';
 
@@ -96,9 +96,9 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
     const jsPath = this.extensionResource('/media/index.js')
 
     const hash = getHash()
-		const version = Date.now().toString();
+    const version = Date.now().toString();
 
-		const source = await this.getResourcePath(webviewPanel, this._resource, version);
+    const source = await this.getResourcePath(webviewPanel, this._resource, version);
 
     const base = `<base href="${escapeAttribute(basePath)}">`
     const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${cspSource}; script-src 'nonce-${hash}'; style-src ${cspSource} 'nonce-${hash}';">`
@@ -109,24 +109,24 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
     return `<!DOCTYPE html><html><head>${base}${csp}${css}${metadata}</head><body>${script}</body></html>`
   }
 
-	private async getResourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): Promise<string> {
-		if (resource.scheme === 'git') {
-			const stat = await vscode.workspace.fs.stat(resource);
-			if (stat.size === 0) {
-				return this.emptySvgDataUri;
-			}
-		}
+  private async getResourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): Promise<string> {
+    if (resource.scheme === 'git') {
+      const stat = await vscode.workspace.fs.stat(resource);
+      if (stat.size === 0) {
+        return this.emptySvgDataUri;
+      }
+    }
 
-		// Avoid adding cache busting if there is already a query string
-		if (resource.query) {
-			return webviewEditor.resource.toString();
-		}
-		return webviewEditor.resource.with({ query: `version=${version}` }).toString();
-	}
+    // Avoid adding cache busting if there is already a query string
+    if (resource.query) {
+      return webviewEditor.resource.toString();
+    }
+    return webviewEditor.resource.with({ query: `version=${version}` }).toString();
+  }
 
-	private extensionResource (path: string) {
-		return this._panel.webview.asWebviewUri(this._extensionUri.with({
-			path: this.extensionRoot.path + path
-		}));
-	}
+  private extensionResource (path: string) {
+    return this._panel.webview.asWebviewUri(this._extensionUri.with({
+      path: this.extensionRoot.path + path
+    }));
+  }
 }

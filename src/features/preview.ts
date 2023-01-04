@@ -150,9 +150,9 @@ export class Preview {
     const jsPath = this.extensionResource('/media/index.js')
 
     const token = getToken()
-		const version = Date.now().toString();
+    const version = Date.now().toString();
 
-		const source = await this.getResourcePath(this._panel, this._resource, version);
+    const source = await this.getResourcePath(this._panel, this._resource, version);
 
     const base = `<base href="${escapeAttribute(basePath)}">`
     const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${cspSource}; script-src 'nonce-${token}'; style-src ${cspSource} 'nonce-${token}';">`
@@ -163,24 +163,24 @@ export class Preview {
     return `<!DOCTYPE html><html><head>${base}${csp}${css}${metadata}</head><body>${script}</body></html>`
   }
 
-	private async getResourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): Promise<string> {
-		if (resource.scheme === 'git') {
-			const stat = await vscode.workspace.fs.stat(resource);
-			if (stat.size === 0) {
-				return this.emptySvgDataUri;
-			}
-		}
+  private async getResourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): Promise<string> {
+    if (resource.scheme === 'git') {
+      const stat = await vscode.workspace.fs.stat(resource);
+      if (stat.size === 0) {
+        return this.emptySvgDataUri;
+      }
+    }
 
-		// Avoid adding cache busting if there is already a query string
-		if (resource.query) {
-			return this._panel.webview.asWebviewUri(resource).toString();
-		}
-		return this._panel.webview.asWebviewUri(resource).with({ query: `version=${version}` }).toString();
-	}
+    // Avoid adding cache busting if there is already a query string
+    if (resource.query) {
+      return this._panel.webview.asWebviewUri(resource).toString();
+    }
+    return this._panel.webview.asWebviewUri(resource).with({ query: `version=${version}` }).toString();
+  }
 
-	private extensionResource (path: string) {
-		return this._panel.webview.asWebviewUri(this._extensionUri.with({
-			path: this._extensionUri.path + path
-		}));
-	}
+  private extensionResource (path: string) {
+    return this._panel.webview.asWebviewUri(this._extensionUri.with({
+      path: this._extensionUri.path + path
+    }));
+  }
 }
