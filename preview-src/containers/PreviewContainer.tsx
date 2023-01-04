@@ -47,12 +47,12 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
   constructor (props: PreviewContainerProps) {
     super(props)
 
-    this.zoomInTelemetryDebounced = debounce(
+    this.sendZoomInTelemetryDebounced = debounce(
       () => telemetryReporter.sendZoomEvent('in', 'mousewheel'),
       250
     )
 
-    this.zoomOutTelemetryDebounced = debounce(
+    this.sendZoomOutTelemetryDebounced = debounce(
       () => telemetryReporter.sendZoomEvent('out', 'mousewheel'),
       250
     )
@@ -123,6 +123,10 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
     this.props.toggleSourceImageValidity(true)
   }
 
+  getWebviewResourcePath (source: string) {
+    return document.getElementById('svg-previewer-resource')?.dataset.src || source;
+  }
+
   getScaledDimension () {
     const originalDimension = this.props.source.data.dimension
 
@@ -142,7 +146,7 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
       ? <PreviewError />
       : (
         <Preview
-          uri={this.props.source.uri}
+          resource={this.getWebviewResourcePath(this.props.source.uri)}
           attachRef={this.attachRef}
           dimension={this.getScaledDimension()}
           onWheel={this.handleOnWheel}

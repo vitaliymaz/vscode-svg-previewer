@@ -29,7 +29,7 @@ export class Preview {
       viewColumn,
       {
         enableScripts: true,
-        localResourceRoots: [path.resolve(extensionUri.path, 'media')]
+        localResourceRoots: [vscode.Uri.file(path.resolve(extensionUri.path, 'media'))]
       }
     )
     return new Preview(source, panel, extensionUri, telemetryReporter)
@@ -137,8 +137,8 @@ export class Preview {
   private setPanelIcon () {
     const root = this.extensionResource('/media/images')
     this._panel.iconPath = {
-      light: vscode.Uri.file(path.join(root, 'preview.svg')),
-      dark: vscode.Uri.file(path.join(root, 'preview-inverse.svg'))
+      light: vscode.Uri.file(path.join(root.path, 'preview.svg')),
+      dark: vscode.Uri.file(path.join(root.path, 'preview-inverse.svg'))
     }
   }
 
@@ -149,33 +149,26 @@ export class Preview {
     const cssPath = this.extensionResource('/media/styles/styles.css')
     const jsPath = this.extensionResource('/media/index.js')
 
-    const token = getToken()
+    const hash = getHash()
     const version = Date.now().toString();
 
-    const source = await this.getResourcePath(this._panel, this._resource, version);
+    const source = this.getResourcePath(this._panel, this._resource, version);
 
     const base = `<base href="${escapeAttribute(basePath)}">`
-    const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${cspSource}; script-src 'nonce-${token}'; style-src ${cspSource} 'nonce-${token}';">`
-    const metadata = `<meta id="svg-previewer-source" data-src="${escapeAttribute(source)}">`
-    const css = `<link rel="stylesheet" type="text/css" href="${escapeAttribute(cssPath)}" nonce="${token}">`
-    const scripts = `<script type="text/javascript" src="${escapeAttribute(jsPath)}" nonce="${token}"></script>`
+    const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${webview.cspSource}; script-src 'nonce-${hash}'; style-src ${webview.cspSource} 'nonce-${hash}';">`
+    const metadata = `<meta id="svg-previewer-resource" data-src="${escapeAttribute(source)}">`
+    const css = `<link rel="stylesheet" type="text/css" href="${escapeAttribute(cssPath)}" nonce="${hash}">`
+    const scripts = `<script type="text/javascript" src="${escapeAttribute(jsPath)}" nonce="${hash}"></script>`
 
-    return `<!DOCTYPE html><html><head>${base}${csp}${css}${metadata}</head><body>${script}</body></html>`
+    return `<!DOCTYPE html><html><head>${base}${csp}${css}${metadata}</head><body>${scripts}</body></html>`
   }
 
-  private async getResourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): Promise<string> {
-    if (resource.scheme === 'git') {
-      const stat = await vscode.workspace.fs.stat(resource);
-      if (stat.size === 0) {
-        return this.emptySvgDataUri;
-      }
-    }
-
+  private getResourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): string {
     // Avoid adding cache busting if there is already a query string
     if (resource.query) {
-      return this._panel.webview.asWebviewUri(resource).toString();
+      return webviewEditor.webview.asWebviewUri(resource).toString();
     }
-    return this._panel.webview.asWebviewUri(resource).with({ query: `version=${version}` }).toString();
+    return webviewEditor.webview.asWebviewUri(resource).with({ query: `version=${version}` }).toString();
   }
 
   private extensionResource (path: string) {

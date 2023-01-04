@@ -27,7 +27,7 @@ export function activate (context: vscode.ExtensionContext) {
 
   context.subscriptions.push(commandManager)
 
-  const previewEditorProvider = new PreviewEditorProvider(extensionUri, telemetryReporter)
+  const previewEditorProvider = new PreviewEditorProvider(context.extensionUri, telemetryReporter)
   context.subscriptions.push(vscode.window.registerCustomEditorProvider('svgPreviewer.customEditor', previewEditorProvider))
 }
 

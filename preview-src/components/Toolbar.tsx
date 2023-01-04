@@ -11,7 +11,7 @@ interface ToolbarProps {
   zoomIn: Function;
   zoomOut: Function;
   zoomReset: Function;
-  fileSize?: string;
+  fileSize: string;
   sourceImageValidity: boolean;
   onBtnMouseDown: JSX.MouseEventHandler<EventTarget>;
   activeBtn?: string;

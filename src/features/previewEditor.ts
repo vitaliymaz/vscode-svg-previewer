@@ -1,5 +1,4 @@
 import * as vscode from 'vscode'
-import * as path from 'path'
 
 import TelemetryReporter from 'vscode-extension-telemetry'
 
@@ -15,10 +14,6 @@ import {
 export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
   public static readonly viewType = 'svgPreviewer.customEditor';
 
-  private static readonly emptySvgDataUri = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMSIgd2lkdGg9IjEiPjwvc3ZnPg==';
-
-  private static _resource?: string;
-
   constructor (
     private readonly extensionUri: vscode.Uri,
     private readonly telemetryReporter: TelemetryReporter
@@ -28,7 +23,6 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
     document: vscode.TextDocument,
     webviewPanel: vscode.WebviewPanel
   ): Promise<void> {
-    this._resource = document.uri
     this.telemetryReporter.sendTelemetryEvent(TELEMETRY_EVENT_SHOW_PREVIEW_EDITOR)
 
     const update = async () => {
@@ -38,7 +32,7 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
     }
 
     webviewPanel.webview.options = { enableScripts: true }
-    webviewPanel.webview.html = this.getHtml(webviewPanel)
+    webviewPanel.webview.html = this.getHtml(webviewPanel, document.uri)
 
     await update()
 
@@ -88,45 +82,38 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
     })
   }
 
-  private getHtml (webviewPanel: vscode.WebviewPanel) {
+  private getHtml (webviewPanel: vscode.WebviewPanel, resource: vscode.Uri) {
     const webview = webviewPanel.webview
 
-    const basePath = this.extensionResource('/media')
-    const cssPath = this.extensionResource('/media/styles/styles.css')
-    const jsPath = this.extensionResource('/media/index.js')
+    const basePath = this.extensionResource(webviewPanel, '/media')
+    const cssPath = this.extensionResource(webviewPanel, '/media/styles/styles.css')
+    const jsPath = this.extensionResource(webviewPanel, '/media/index.js')
 
     const hash = getHash()
     const version = Date.now().toString();
 
-    const source = await this.getResourcePath(webviewPanel, this._resource, version);
+    const source = this.getResourcePath(webviewPanel, resource, version);
 
     const base = `<base href="${escapeAttribute(basePath)}">`
-    const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${cspSource}; script-src 'nonce-${hash}'; style-src ${cspSource} 'nonce-${hash}';">`
-    const metadata = `<meta id="svg-previewer-source" data-src="${escapeAttribute(source)}">`
+    const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${webview.cspSource}; script-src 'nonce-${hash}'; style-src ${webview.cspSource} 'nonce-${hash}';">`
+    const metadata = `<meta id="svg-previewer-resource" data-src="${escapeAttribute(source)}">`
     const css = `<link rel="stylesheet" type="text/css" href="${escapeAttribute(cssPath)}" nonce="${hash}">`
     const scripts = `<script type="text/javascript" src="${escapeAttribute(jsPath)}" nonce="${hash}"></script>`
 
-    return `<!DOCTYPE html><html><head>${base}${csp}${css}${metadata}</head><body>${script}</body></html>`
+    return `<!DOCTYPE html><html><head>${base}${csp}${css}${metadata}</head><body>${scripts}</body></html>`
   }
 
-  private async getResourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): Promise<string> {
-    if (resource.scheme === 'git') {
-      const stat = await vscode.workspace.fs.stat(resource);
-      if (stat.size === 0) {
-        return this.emptySvgDataUri;
-      }
-    }
-
+  private getResourcePath (webviewPanel: vscode.WebviewPanel, resource: vscode.Uri, version: string): string {
     // Avoid adding cache busting if there is already a query string
     if (resource.query) {
-      return webviewEditor.resource.toString();
+      return webviewPanel.webview.asWebviewUri(resource).toString();
     }
-    return webviewEditor.resource.with({ query: `version=${version}` }).toString();
+    return webviewPanel.webview.asWebviewUri(resource).with({ query: `version=${version}` }).toString();
   }
 
-  private extensionResource (path: string) {
-    return this._panel.webview.asWebviewUri(this._extensionUri.with({
-      path: this.extensionRoot.path + path
+  private extensionResource (webviewPanel: vscode.WebviewPanel, path: string) {
+    return webviewPanel.webview.asWebviewUri(this.extensionUri.with({
+      path: this.extensionUri.path + path
     }));
   }
 }

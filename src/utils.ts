@@ -5,16 +5,11 @@ const SVG_TAG_REGEXP = /<svg.+?>/
 const WIDTH_REGEXP = /width=("|')([0-9.,]+)\w*("|')/
 const HEIGHT_REGEXP = /height=("|')([0-9.,]+)\w*("|')/
 
-export interface IDimension {
-  width: number;
-  height: number;
-}
-
 export function isSvgUri (uri: vscode.Uri) {
   return uri.path.endsWith('.svg')
 }
 
-export function getOriginalDimension (data: string): IDimension | null {
+export function getOriginalDimension (data: string): Record<'width' | 'height', number> | null {
   const formatted = data.replace(NEW_LINE_REGEXP, ' ')
   const svg = formatted.match(SVG_TAG_REGEXP)
   let width = null; let height = null
@@ -22,7 +17,7 @@ export function getOriginalDimension (data: string): IDimension | null {
     width = svg[0].match(WIDTH_REGEXP) ? svg[0].match(WIDTH_REGEXP)![2] : null
     height = svg[0].match(HEIGHT_REGEXP) ? svg[0].match(HEIGHT_REGEXP)![2] : null
   }
-  return width && height ? { width: parseFloat(width), height: parseFloat(width) } : null
+  return width && height ? { width: parseFloat(width), height: parseFloat(height) } : null
 };
 
 export function getByteCountByContent (s: string = ''): number {

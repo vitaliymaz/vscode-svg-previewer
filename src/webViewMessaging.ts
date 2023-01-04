@@ -1,5 +1,3 @@
-import type { IDimension } from './utils'
-
 export interface IMessage {
     command: string;
     payload: any;
@@ -8,7 +6,7 @@ export interface IMessage {
 export interface IUpdatePreviewPayload {
     uri: string;
     data: {
-      dimension: IDimension | null,
+      dimension: { width: number; height: number; } | null,
       filesize: string | null
     };
     settings: object;

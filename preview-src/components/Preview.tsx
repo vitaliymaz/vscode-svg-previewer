@@ -3,7 +3,7 @@ import { h, FunctionalComponent, Ref, JSX } from 'preact'
 import { ISettings } from '../store/IState'
 
 interface PreviewProps {
-  data: string;
+  resource: string;
   settings: ISettings;
   attachRef: Ref<HTMLImageElement>;
   dimension: { width: number, height: number, units: string };
@@ -13,7 +13,7 @@ interface PreviewProps {
 }
 
 const Preview: FunctionalComponent<PreviewProps> = ({
-  src,
+  resource,
   attachRef,
   dimension: { width, height, units },
   onWheel,
@@ -30,7 +30,7 @@ const Preview: FunctionalComponent<PreviewProps> = ({
   return (
     <div className={`preview ${background} ${settings.showBoundingBox ? 'bounding-box' : ''} ${showTransparencyGrid ? 'transparency-grid' : ''}`} onWheel={onWheel}>
       <img
-        src={uri}
+        src={resource}
         ref={attachRef}
         style={styles}
         alt=''

@@ -50,7 +50,7 @@ class ToolbarContainer extends Component<ToolbarContainerProps, ToolbarContainer
   }
 
   getFileSize () {
-    return this.props.source.data ? this.props.source.data.filesize : '0 B'
+    return this.props.source.data.filesize || '0 B'
   }
 
   handleBtnMouseDown = (e: MouseEvent) => {
