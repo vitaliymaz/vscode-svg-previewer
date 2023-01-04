@@ -16,7 +16,7 @@ export function activate (context: vscode.ExtensionContext) {
 
   telemetryReporter.sendTelemetryEvent(TelemetryEvents.TELEMETRY_EVENT_ACTIVATION)
 
-  const previewManager = new PreviewManager(context.extensionPath, telemetryReporter)
+  const previewManager = new PreviewManager(context.extensionUri, telemetryReporter)
   vscode.window.registerWebviewPanelSerializer('svg-preview', previewManager)
 
   const commandManager = new CommandManager()
@@ -27,7 +27,8 @@ export function activate (context: vscode.ExtensionContext) {
 
   context.subscriptions.push(commandManager)
 
-  context.subscriptions.push(PreviewEditorProvider.register(context.extensionPath, telemetryReporter))
+  const previewEditorProvider = new PreviewEditorProvider(extensionUri, telemetryReporter)
+  context.subscriptions.push(vscode.window.registerCustomEditorProvider('svgPreviewer.customEditor', previewEditorProvider))
 }
 
 export function deactivate () {

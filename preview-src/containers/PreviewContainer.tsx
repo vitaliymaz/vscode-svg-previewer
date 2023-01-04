@@ -142,7 +142,7 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
       ? <PreviewError />
       : (
         <Preview
-          data={this.props.source.data}
+          uri={this.props.source.uri}
           attachRef={this.attachRef}
           dimension={this.getScaledDimension()}
           onWheel={this.handleOnWheel}

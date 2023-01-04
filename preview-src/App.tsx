@@ -26,7 +26,7 @@ class App extends Component<AppProps> {
     return (
       <div className='layout'>
         <ToolbarContainer />
-        {this.props.source.data && <PreviewContainer />}
+        {this.props.source.uri && <PreviewContainer />}
       </div>
     )
   }

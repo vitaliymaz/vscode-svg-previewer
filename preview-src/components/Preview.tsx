@@ -13,7 +13,7 @@ interface PreviewProps {
 }
 
 const Preview: FunctionalComponent<PreviewProps> = ({
-  data,
+  src,
   attachRef,
   dimension: { width, height, units },
   onWheel,
@@ -30,7 +30,7 @@ const Preview: FunctionalComponent<PreviewProps> = ({
   return (
     <div className={`preview ${background} ${settings.showBoundingBox ? 'bounding-box' : ''} ${showTransparencyGrid ? 'transparency-grid' : ''}`} onWheel={onWheel}>
       <img
-        src={`data:image/svg+xml,${encodeURIComponent(data.text)}`}
+        src={uri}
         ref={attachRef}
         style={styles}
         alt=''

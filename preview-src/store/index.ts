@@ -7,7 +7,7 @@ const bodyElClassList = document.querySelector('body')!.classList
 const initialState: IState = {
   source: {
     uri: vscodeApi.getState() ? vscodeApi.getState().uri : null,
-    data: vscodeApi.getState() ? vscodeApi.getState().data : { dimensions: null, filesize: null, text: null },
+    data: vscodeApi.getState() ? vscodeApi.getState().data : { dimensions: null, filesize: null },
     settings: vscodeApi.getState() ? vscodeApi.getState().settings : { showBoundingBox: false, showTransparencyGrid: false }
   },
   scale: 1,

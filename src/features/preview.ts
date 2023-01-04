@@ -5,8 +5,7 @@ import TelemetryReporter from 'vscode-extension-telemetry'
 
 import { IMessage, updatePreview, activeColorThemeChanged } from '../webViewMessaging'
 import { TELEMETRY_EVENT_TOGGLE_BOUNDING_BOX, TELEMETRY_EVENT_TOGGLE_TRANSPARENCY_GRID } from '../telemetry/events'
-import { getOriginalDimension } from '../utils/originalDimensions'
-import { getByteCountByContent, humanFileSize } from '../utils/fileSize'
+import { getOriginalDimension, getByteCountByContent, humanFileSize, escapeAttribute, getHash } from '../utils'
 
 const localize = nls.loadMessageBundle()
 
@@ -23,31 +22,31 @@ export class Preview {
 
   private changeThemeSubscription: vscode.Disposable;
 
-  public static async create (source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionPath: string, telemetryReporter: TelemetryReporter) {
+  public static async create (source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionUri: vscode.Uri, telemetryReporter: TelemetryReporter) {
     const panel = vscode.window.createWebviewPanel(
       Preview.viewType,
       Preview.getPreviewTitle(source.path),
       viewColumn,
       {
         enableScripts: true,
-        localResourceRoots: [vscode.Uri.file(path.join(extensionPath, 'media'))]
+        localResourceRoots: [path.resolve(extensionUri.path, 'media')]
       }
     )
-    return new Preview(source, panel, extensionPath, telemetryReporter)
+    return new Preview(source, panel, extensionUri, telemetryReporter)
   }
 
-  public static async revive (source: vscode.Uri, panel: vscode.WebviewPanel, extensionPath: string, telemetryReporter: TelemetryReporter) {
-    return new Preview(source, panel, extensionPath, telemetryReporter)
+  public static async revive (source: vscode.Uri, panel: vscode.WebviewPanel, extensionUri: vscode.Uri, telemetryReporter: TelemetryReporter) {
+    return new Preview(source, panel, extensionUri, telemetryReporter)
   }
 
-  private static getPreviewTitle (path: string): string {
-    return localize('svg.preview.panel.title', 'Preview {0}', path.replace(/^.*[\\/]/, ''))
+  private static getPreviewTitle (p: string): string {
+    return localize('svg.preview.panel.title', 'Preview {0}', p.replace(/^.*[\\/]/, ''))
   }
 
   constructor (
     private _resource: vscode.Uri,
     private _panel: vscode.WebviewPanel,
-    private readonly _extensionPath: string,
+    private readonly _extensionUri: vscode.Uri,
     private readonly telemetryReporter: TelemetryReporter
   ) {
     this._panel.webview.html = this.getHtml()
@@ -130,13 +129,13 @@ export class Preview {
 
     return updatePreview({
       uri: uri.toString(),
-      data: { dimension, filesize, text },
+      data: { dimension, filesize },
       settings: { showBoundingBox, showTransparencyGrid }
     })
   }
 
   private setPanelIcon () {
-    const root = path.join(this._extensionPath, 'media', 'images')
+    const root = this.extensionResource('/media/images')
     this._panel.iconPath = {
       light: vscode.Uri.file(path.join(root, 'preview.svg')),
       dark: vscode.Uri.file(path.join(root, 'preview-inverse.svg'))
@@ -146,19 +145,42 @@ export class Preview {
   private getHtml () {
     const webview = this._panel.webview
 
-    const basePath = vscode.Uri.file(path.join(this._extensionPath, 'media'))
-    const cssPath = vscode.Uri.file(path.join(this._extensionPath, 'media', 'styles', 'styles.css'))
-    const jsPath = vscode.Uri.file(path.join(this._extensionPath, 'media', 'index.js'))
+    const basePath = this.extensionResource('/media')
+    const cssPath = this.extensionResource('/media/styles/styles.css')
+    const jsPath = this.extensionResource('/media/index.js')
 
-    const base = `<base href="${webview.asWebviewUri(basePath)}">`
-    const securityPolicy = `
-        <meta
-          http-equiv="Content-Security-Policy"
-          content="default-src ${webview.cspSource}; img-src ${webview.cspSource} data:; script-src ${webview.cspSource}; style-src ${webview.cspSource};"
-        />
-    `
-    const css = `<link rel="stylesheet" type="text/css" href="${webview.asWebviewUri(cssPath)}">`
-    const scripts = `<script type="text/javascript" src="${webview.asWebviewUri(jsPath)}"></script>`
-    return `<!DOCTYPE html><html><head>${base}${securityPolicy}${css}</head><body>${scripts}</body></html>`
+    const token = getToken()
+		const version = Date.now().toString();
+
+		const source = await this.getResourcePath(this._panel, this._resource, version);
+
+    const base = `<base href="${escapeAttribute(basePath)}">`
+    const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${cspSource}; script-src 'nonce-${token}'; style-src ${cspSource} 'nonce-${token}';">`
+    const metadata = `<meta id="svg-previewer-source" data-src="${escapeAttribute(source)}">`
+    const css = `<link rel="stylesheet" type="text/css" href="${escapeAttribute(cssPath)}" nonce="${token}">`
+    const scripts = `<script type="text/javascript" src="${escapeAttribute(jsPath)}" nonce="${token}"></script>`
+
+    return `<!DOCTYPE html><html><head>${base}${csp}${css}${metadata}</head><body>${script}</body></html>`
   }
+
+	private async getResourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): Promise<string> {
+		if (resource.scheme === 'git') {
+			const stat = await vscode.workspace.fs.stat(resource);
+			if (stat.size === 0) {
+				return this.emptySvgDataUri;
+			}
+		}
+
+		// Avoid adding cache busting if there is already a query string
+		if (resource.query) {
+			return this._panel.webview.asWebviewUri(resource).toString();
+		}
+		return this._panel.webview.asWebviewUri(resource).with({ query: `version=${version}` }).toString();
+	}
+
+	private extensionResource (path: string) {
+		return this._panel.webview.asWebviewUri(this._extensionUri.with({
+			path: this._extensionUri.path + path
+		}));
+	}
 }
