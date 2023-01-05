@@ -2,7 +2,7 @@ import * as vscode from 'vscode'
 import TelemetryReporter from 'vscode-extension-telemetry'
 
 import { isSvgUri } from '../utils'
-import { Preview } from './preview'
+import { Preview } from './previewPanel'
 import { TelemetryEvents } from '../telemetry'
 
 export class PreviewManager implements vscode.WebviewPanelSerializer {
