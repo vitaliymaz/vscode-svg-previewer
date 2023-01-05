@@ -60,7 +60,7 @@
             "editor/title": [
                 {
                     "command": "svg.showPreviewToSide",
-                    "when": "editorLangId == xml",
+                    "when": "resourceExtname == .svg",
                     "alt": "svg.showPreviewToSide",
                     "group": "navigation"
                 },
@@ -74,12 +74,12 @@
             "commandPalette": [
                 {
                     "command": "svg.showPreview",
-                    "when": "editorLangId == xml",
+                    "when": "resourceExtname == .svg",
                     "group": "navigation"
                 },
                 {
                     "command": "svg.showPreviewToSide",
-                    "when": "editorLangId == xml",
+                    "when": "resourceExtname == .svg",
                     "group": "navigation"
                 },
                 {
@@ -92,7 +92,7 @@
                 {
                     "command": "svg.showPreview",
                     "group": "navigation",
-                    "when": "resourceLangId == xml"
+                    "when": "resourceExtname == .svg"
                 }
             ]
         },
@@ -122,13 +122,13 @@
                 "command": "svg.showPreview",
                 "key": "shift+ctrl+v",
                 "mac": "shift+cmd+v",
-                "when": "editorLangId == xml"
+                "when": "resourceExtname == .svg"
             },
             {
                 "command": "svg.showPreviewToSide",
                 "key": "ctrl+k v",
                 "mac": "cmd+k v",
-                "when": "editorLangId == xml"
+                "when": "resourceExtname == .svg"
             }
         ]
     },
