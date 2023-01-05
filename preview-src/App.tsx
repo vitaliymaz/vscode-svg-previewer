@@ -6,8 +6,8 @@ import PreviewContainer from './containers/PreviewContainer'
 import { actions, ISource, IState } from './store'
 
 interface AppProps {
-    updateSource: Function;
-    updateSettings: Function;
+    updateSource: Function & ((...args: any[]) => any);
+    updateSettings: Function & ((...args: any[]) => any);
     source: ISource;
 }
 

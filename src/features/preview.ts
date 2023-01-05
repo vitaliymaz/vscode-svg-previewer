@@ -3,14 +3,13 @@ import * as path from 'path'
 import * as nls from 'vscode-nls'
 import TelemetryReporter from 'vscode-extension-telemetry'
 
-import { IMessage, updatePreview, activeColorThemeChanged } from '../webViewMessaging'
-import { TELEMETRY_EVENT_TOGGLE_BOUNDING_BOX, TELEMETRY_EVENT_TOGGLE_TRANSPARENCY_GRID } from '../telemetry/events'
-import { getOriginalDimension, getByteCountByContent, humanFileSize, getResourceRoots, escapeAttribute, getHash } from '../utils'
+import { IMessage, activeColorThemeChangedEvent, previewUpdatedEvent, webviewMessageReciever } from '../webViewMessaging'
+import { getResourceRoots, extensionResource, getWebviewContents } from '../utils'
 
 const localize = nls.loadMessageBundle()
 
 export class Preview {
-  private static readonly viewType = 'svg-preview';
+  private static readonly viewType = 'svgPreviewer';
 
   private readonly _onDisposeEmitter = new vscode.EventEmitter<void>();
   public readonly onDispose = this._onDisposeEmitter.event;
@@ -21,6 +20,7 @@ export class Preview {
   private _postponedMessage?: IMessage;
 
   private changeThemeSubscription: vscode.Disposable;
+  private recieveMessageSubscription: vscode.Disposable;
 
   public static async create (sourceUri: vscode.Uri, viewColumn: vscode.ViewColumn, extensionUri: vscode.Uri, telemetryReporter: TelemetryReporter) {
     const panel = vscode.window.createWebviewPanel(
@@ -35,8 +35,8 @@ export class Preview {
     return new Preview(sourceUri, panel, extensionUri, telemetryReporter)
   }
 
-  public static async revive (sourceUri: vscode.Uri, panel: vscode.WebviewPanel, extensionUri: vscode.Uri, telemetryReporter: TelemetryReporter) {
-    return new Preview(sourceUri, panel, extensionUri, telemetryReporter)
+  public static async revive (source: vscode.Uri, panel: vscode.WebviewPanel, extensionUri: vscode.Uri, telemetryReporter: TelemetryReporter) {
+    return new Preview(source, panel, extensionUri, telemetryReporter)
   }
 
   private static getPreviewTitle (p: string): string {
@@ -49,9 +49,10 @@ export class Preview {
     private readonly _extensionUri: vscode.Uri,
     private readonly telemetryReporter: TelemetryReporter
   ) {
-    this._panel.webview.html = this.getHtml()
-
-    this.setPanelIcon()
+    getWebviewContents(this._panel, this._resource, this._extensionUri).then(html => {
+      this._panel.webview.html = html
+      this.setPanelIcon()
+    })
 
     this._panel.onDidChangeViewState((event: vscode.WebviewPanelOnDidChangeViewStateEvent) => {
       this._onDidChangeViewStateEmitter.fire(event)
@@ -65,25 +66,15 @@ export class Preview {
     this._panel.onDidDispose(() => {
       this._onDisposeEmitter.fire()
       this.dispose()
+      this.recieveMessageSubscription.dispose()
       this.changeThemeSubscription.dispose()
     })
 
-    this._panel.webview.onDidReceiveMessage(message => {
-      if (message.command === 'sendTelemetryEvent') {
-        this.telemetryReporter.sendTelemetryEvent(message.payload.eventName, message.payload.properties)
-      }
-      if (message.command === 'changeBoundingBoxVisibility') {
-        vscode.workspace.getConfiguration('svg').update('preview.boundingBox', message.payload.visible, true)
-        this.telemetryReporter.sendTelemetryEvent(TELEMETRY_EVENT_TOGGLE_BOUNDING_BOX, { visible: message.payload.visible })
-      }
-      if (message.command === 'changeTransparencyGridVisibility') {
-        vscode.workspace.getConfiguration('svg').update('preview.transparencyGrid', message.payload.visible, true)
-        this.telemetryReporter.sendTelemetryEvent(TELEMETRY_EVENT_TOGGLE_TRANSPARENCY_GRID, { visible: message.payload.visible })
-      }
-    })
+    this.recieveMessageSubscription = this._panel.webview
+      .onDidReceiveMessage(webviewMessageReciever.bind(null, this.telemetryReporter))
 
     this.changeThemeSubscription = vscode.window.onDidChangeActiveColorTheme(() => {
-      this.postMessage(activeColorThemeChanged())
+      this.postMessage(activeColorThemeChangedEvent())
     })
   }
 
@@ -101,8 +92,7 @@ export class Preview {
     }
     this._panel.title = Preview.getPreviewTitle(this._resource.fsPath)
 
-    const message = await this.getUpdateWebViewMessage(this._resource)
-    this.postMessage(message)
+    this.postMessage(await previewUpdatedEvent(this._resource))
   }
 
   public dispose () {
@@ -119,61 +109,11 @@ export class Preview {
     }
   }
 
-  private async getUpdateWebViewMessage (uri: vscode.Uri) {
-    const document = await vscode.workspace.openTextDocument(uri)
-    const text = document.getText()
-    const dimension = text ? getOriginalDimension(text) : null
-    const filesize = text ? humanFileSize(getByteCountByContent(text)) : null
-    const showBoundingBox = <boolean>vscode.workspace.getConfiguration('svg').get('preview.boundingBox')
-    const showTransparencyGrid = <boolean>vscode.workspace.getConfiguration('svg').get('preview.transparencyGrid')
-
-    return updatePreview({
-      uri: uri.toString(),
-      data: { dimension, filesize },
-      settings: { showBoundingBox, showTransparencyGrid }
-    })
-  }
-
   private setPanelIcon () {
-    const root = this.extensionResource('/media/images')
+    const root = extensionResource(this._panel, this._extensionUri, '/media/images')
     this._panel.iconPath = {
       light: vscode.Uri.file(path.join(root.path, 'preview.svg')),
       dark: vscode.Uri.file(path.join(root.path, 'preview-inverse.svg'))
     }
-  }
-
-  private getHtml () {
-    const webview = this._panel.webview
-
-    const basePath = this.extensionResource('/media')
-    const cssPath = this.extensionResource('/media/styles/styles.css')
-    const jsPath = this.extensionResource('/media/index.js')
-
-    const hash = getHash()
-    const version = Date.now().toString();
-
-    const source = this.getResourcePath(this._panel, this._resource, version);
-
-    const base = `<base href="${escapeAttribute(basePath)}">`
-    const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${webview.cspSource}; script-src 'nonce-${hash}'; style-src ${webview.cspSource} 'nonce-${hash}';">`
-    const metadata = `<meta id="svg-previewer-resource" data-src="${escapeAttribute(source)}">`
-    const css = `<link rel="stylesheet" type="text/css" href="${escapeAttribute(cssPath)}" nonce="${hash}">`
-    const scripts = `<script type="text/javascript" src="${escapeAttribute(jsPath)}" nonce="${hash}"></script>`
-
-    return `<!DOCTYPE html><html><head>${base}${csp}${css}${metadata}</head><body>${scripts}</body></html>`
-  }
-
-  private getResourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): string {
-    // Avoid adding cache busting if there is already a query string
-    if (resource.query) {
-      return webviewEditor.webview.asWebviewUri(resource).toString();
-    }
-    return webviewEditor.webview.asWebviewUri(resource).with({ query: `version=${version}` }).toString();
-  }
-
-  private extensionResource (path: string) {
-    return this._panel.webview.asWebviewUri(this._extensionUri.with({
-      path: this._extensionUri.path + path
-    }));
   }
 }
