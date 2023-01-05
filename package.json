@@ -14,8 +14,14 @@
     ],
     "activationEvents": [
         "onLanguage:xml",
+        "onLanguage:svg",
         "onWebviewPanel:svg-preview",
-        "onCustomEditor:svgPreviewer.customEditor"
+        "onCustomEditor:svgPreviewer.customEditor",
+        "onCommand:vscode.openWith",
+        "onCommand:svg.showPreview",
+        "onCommand:svg.showPreviewToSide",
+        "onCommand:svg.showSource",
+        "workspaceContains:**/*.svg"
     ],
     "main": "./out/extension",
     "contributes": {
