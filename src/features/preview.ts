@@ -5,7 +5,7 @@ import TelemetryReporter from 'vscode-extension-telemetry'
 
 import { IMessage, updatePreview, activeColorThemeChanged } from '../webViewMessaging'
 import { TELEMETRY_EVENT_TOGGLE_BOUNDING_BOX, TELEMETRY_EVENT_TOGGLE_TRANSPARENCY_GRID } from '../telemetry/events'
-import { getOriginalDimension, getByteCountByContent, humanFileSize, escapeAttribute, getHash } from '../utils'
+import { getOriginalDimension, getByteCountByContent, humanFileSize, getResourceRoots, escapeAttribute, getHash } from '../utils'
 
 const localize = nls.loadMessageBundle()
 
@@ -22,21 +22,21 @@ export class Preview {
 
   private changeThemeSubscription: vscode.Disposable;
 
-  public static async create (source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionUri: vscode.Uri, telemetryReporter: TelemetryReporter) {
+  public static async create (sourceUri: vscode.Uri, viewColumn: vscode.ViewColumn, extensionUri: vscode.Uri, telemetryReporter: TelemetryReporter) {
     const panel = vscode.window.createWebviewPanel(
       Preview.viewType,
-      Preview.getPreviewTitle(source.path),
+      Preview.getPreviewTitle(sourceUri.path),
       viewColumn,
       {
         enableScripts: true,
-        localResourceRoots: [vscode.Uri.file(path.resolve(extensionUri.path, 'media'))]
+        localResourceRoots: getResourceRoots(sourceUri, extensionUri)
       }
     )
-    return new Preview(source, panel, extensionUri, telemetryReporter)
+    return new Preview(sourceUri, panel, extensionUri, telemetryReporter)
   }
 
-  public static async revive (source: vscode.Uri, panel: vscode.WebviewPanel, extensionUri: vscode.Uri, telemetryReporter: TelemetryReporter) {
-    return new Preview(source, panel, extensionUri, telemetryReporter)
+  public static async revive (sourceUri: vscode.Uri, panel: vscode.WebviewPanel, extensionUri: vscode.Uri, telemetryReporter: TelemetryReporter) {
+    return new Preview(sourceUri, panel, extensionUri, telemetryReporter)
   }
 
   private static getPreviewTitle (p: string): string {

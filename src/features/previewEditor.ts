@@ -3,7 +3,7 @@ import * as vscode from 'vscode'
 import TelemetryReporter from 'vscode-extension-telemetry'
 
 import { IMessage, updatePreview, activeColorThemeChanged } from '../webViewMessaging'
-import { getOriginalDimension, getByteCountByContent, humanFileSize, escapeAttribute, getHash } from '../utils'
+import { getOriginalDimension, getByteCountByContent, humanFileSize, escapeAttribute, getHash, getResourceRoots } from '../utils'
 
 import {
   TELEMETRY_EVENT_SHOW_PREVIEW_EDITOR,
@@ -31,7 +31,10 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
       webviewPanel.webview.postMessage(message)
     }
 
-    webviewPanel.webview.options = { enableScripts: true }
+    webviewPanel.webview.options = {
+      enableScripts: true,
+      localResourceRoots: getResourceRoots(document.uri, this.extensionUri)
+    }
     webviewPanel.webview.html = this.getHtml(webviewPanel, document.uri)
 
     await update()

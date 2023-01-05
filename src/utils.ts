@@ -7,7 +7,7 @@ const HEIGHT_REGEXP = /height=("|')([0-9.,]+)\w*("|')/
 
 export function isSvgUri (uri: vscode.Uri) {
   return uri.path.endsWith('.svg')
-}
+};
 
 export function getOriginalDimension (data: string): Record<'width' | 'height', number> | null {
   const formatted = data.replace(NEW_LINE_REGEXP, ' ')
@@ -39,6 +39,13 @@ export function humanFileSize (size: number = 0): string {
 
 export function escapeAttribute (value: string | vscode.Uri): string {
   return value.toString().replace(/"/g, "&quot;");
+};
+
+export function getResourceRoots(sourceUri: vscode.Uri, extensionUri: vscode.Uri) {
+  return [
+    /\/[^\/]+\.\w+$/.test(sourceUri.path) ? vscode.Uri.joinPath(sourceUri, '..') : sourceUri,
+    vscode.Uri.joinPath(extensionUri, 'media')
+  ]
 };
 
 export function getHash () {
