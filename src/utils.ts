@@ -59,34 +59,12 @@ export function humanFileSize (size: number = 0): string {
   return `${numberPart} ${stringPart}`
 }
 
-export async function getWebviewContents(webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, extensionUri: vscode.Uri) {
-  const webview = webviewEditor.webview
-
-  const hash = getHash()
-  const version = Date.now().toString();
-
-  const basePath = extensionResource(webviewEditor, extensionUri, '/media')
-  const cssPath =  extensionResource(webviewEditor, extensionUri, '/media/styles/styles.css')
-  const jsPath =  extensionResource(webviewEditor, extensionUri, '/media/index.js')
-
-  const source = await resourcePath(webviewEditor, resource, version);
-
-  const base = `<base href="${escapeAttribute(basePath)}">`
-  const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${webview.cspSource}; script-src 'nonce-${hash}'; style-src ${webview.cspSource} 'nonce-${hash}';">`
-  const metadata = `<meta id="svg-previewer-resource" data-src="${escapeAttribute(source)}">`
-  const css = `<link rel="stylesheet" type="text/css" href="${escapeAttribute(cssPath)}" nonce="${hash}">`
-  const scripts = `<script type="text/javascript" src="${escapeAttribute(jsPath)}" nonce="${hash}"></script>`
-
-  return `<!DOCTYPE html><html><head>${base}${csp}${css}${metadata}</head><body>${scripts}</body></html>`
-}
-
 export async function resourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): Promise<string> {
   if (resource.scheme === "git" && await getUriBinarySize(resource) === 0) {
     return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMSIgd2lkdGg9IjEiPjwvc3ZnPg==';
   }
   const webviewUri = webviewEditor.webview.asWebviewUri(resource)
-  // Avoid adding cache busting if there is already a query string
-  if (resource.query) return webviewUri.toString();
+  if (resource.query) return webviewUri.toString(); // respect existing cache-buster
   else return webviewUri.with({ query: `version=${version}` }).toString();
 }
 

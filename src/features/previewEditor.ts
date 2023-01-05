@@ -1,8 +1,8 @@
 import * as vscode from 'vscode'
 import TelemetryReporter from 'vscode-extension-telemetry'
 
-import { activeColorThemeChangedEvent, previewUpdatedEvent, webviewMessageReciever } from '../webViewMessaging'
-import { getWebviewContents, getResourceRoots } from '../utils'
+import { activeColorThemeChangedEvent, previewUpdatedEvent, getWebviewContents, webviewMessageReciever } from '../webview'
+import { getResourceRoots } from '../utils'
 import { TELEMETRY_EVENT_SHOW_PREVIEW_EDITOR } from '../telemetry/events'
 
 export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
@@ -18,22 +18,12 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
     webviewPanel: vscode.WebviewPanel
   ): Promise<void> {
     this.telemetryReporter.sendTelemetryEvent(TELEMETRY_EVENT_SHOW_PREVIEW_EDITOR)
-
-    const update = async () => {
-      webviewPanel.webview.postMessage(await previewUpdatedEvent(document.uri))
-    }
-
-    webviewPanel.webview.options = {
-      enableScripts: true,
-      localResourceRoots: getResourceRoots(document.uri, this.extensionUri)
-    }
-    webviewPanel.webview.html = await getWebviewContents(webviewPanel, document.uri, this.extensionUri)
-
-    await update()
+    await this.render(document, webviewPanel)
+    await this.update(document, webviewPanel)
 
     const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
       if (e.document.uri.toString() === document.uri.toString()) {
-        update()
+        this.update(document, webviewPanel)
       }
     })
 
@@ -49,5 +39,17 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
       receiveMessageSubscription.dispose()
       changeThemeSubscription.dispose()
     })
+  }
+
+  async render(document: vscode.TextDocument, webviewPanel: vscode.WebviewPanel) {
+    webviewPanel.webview.options = {
+      enableScripts: true,
+      localResourceRoots: getResourceRoots(document.uri, this.extensionUri)
+    }
+    webviewPanel.webview.html = await getWebviewContents(webviewPanel, document.uri, this.extensionUri)
+  }
+
+  async update(document: vscode.TextDocument, webviewPanel: vscode.WebviewPanel) {
+    webviewPanel.webview.postMessage(await previewUpdatedEvent(document.uri))
   }
 }

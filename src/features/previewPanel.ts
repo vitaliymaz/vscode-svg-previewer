@@ -3,8 +3,8 @@ import * as path from 'path'
 import * as nls from 'vscode-nls'
 import TelemetryReporter from 'vscode-extension-telemetry'
 
-import { IMessage, activeColorThemeChangedEvent, previewUpdatedEvent, webviewMessageReciever } from '../webViewMessaging'
-import { getResourceRoots, extensionResource, getWebviewContents } from '../utils'
+import { IMessage, activeColorThemeChangedEvent, previewUpdatedEvent, webviewMessageReciever, getWebviewContents } from '../webview'
+import { getResourceRoots, extensionResource } from '../utils'
 
 const localize = nls.loadMessageBundle()
 
@@ -49,10 +49,7 @@ export class Preview {
     private readonly _extensionUri: vscode.Uri,
     private readonly telemetryReporter: TelemetryReporter
   ) {
-    getWebviewContents(this._panel, this._resource, this._extensionUri).then(html => {
-      this._panel.webview.html = html
-      this.setPanelIcon()
-    })
+    this.render()
 
     this._panel.onDidChangeViewState((event: vscode.WebviewPanelOnDidChangeViewStateEvent) => {
       this._onDidChangeViewStateEmitter.fire(event)
@@ -84,6 +81,11 @@ export class Preview {
 
   public get panel (): vscode.WebviewPanel {
     return this._panel
+  }
+
+  public async render () {
+    this._panel.webview.html = await getWebviewContents(this._panel, this._resource, this._extensionUri)
+    this.setPanelIcon()
   }
 
   public async update (resource?: vscode.Uri) {
