@@ -59,13 +59,13 @@ export async function getWebviewContents(webviewEditor: vscode.WebviewPanel, res
   const webview = webviewEditor.webview
 
   const hash = getHash()
-  const version = Date.now().toString();
+  const version = Date.now().toString()
 
   const basePath = extensionResource(webviewEditor, extensionUri, '/media')
   const cssPath =  extensionResource(webviewEditor, extensionUri, '/media/styles/styles.css')
   const jsPath =  extensionResource(webviewEditor, extensionUri, '/media/index.js')
 
-  const source = await resourcePath(webviewEditor, resource, version);
+  const source = await resourcePath(webviewEditor, resource, version)
 
   const base = `<base href="${escapeAttribute(basePath)}">`
   const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: ${webview.cspSource}; script-src 'nonce-${hash}'; style-src ${webview.cspSource} 'nonce-${hash}';">`

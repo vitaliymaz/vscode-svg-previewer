@@ -8,8 +8,8 @@ const WIDTH_REGEXP = /width=("|')([0-9.,]+)\w*("|')/
 const HEIGHT_REGEXP = /height=("|')([0-9.,]+)\w*("|')/
 
 export interface IDimension {
-  width: number;
-  height: number;
+  width: number
+  height: number
 }
 
 export function isSvgUri (uri: vscode.Uri) {
@@ -28,7 +28,7 @@ export async function getUriText(uri: vscode.Uri) {
     const buffer = await vscode.workspace.fs.readFile(uri)
     return textDecoder.decode(buffer)
   } catch(_) {
-    return '';
+    return ''
   }
 }
 
@@ -61,28 +61,28 @@ export function humanFileSize (size: number = 0): string {
 
 export async function resourcePath (webviewEditor: vscode.WebviewPanel, resource: vscode.Uri, version: string): Promise<string> {
   if (resource.scheme === "git" && await getUriBinarySize(resource) === 0) {
-    return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMSIgd2lkdGg9IjEiPjwvc3ZnPg==';
+    return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMSIgd2lkdGg9IjEiPjwvc3ZnPg=='
   }
   const webviewUri = webviewEditor.webview.asWebviewUri(resource)
   if (resource.query) return webviewUri.toString(); // respect existing cache-buster
-  else return webviewUri.with({ query: `version=${version}` }).toString();
+  else return webviewUri.with({ query: `version=${version}` }).toString()
 }
 
 export function extensionResource (webviewEditor: vscode.WebviewPanel, extensionUri: vscode.Uri, path: string) {
   return webviewEditor.webview.asWebviewUri(extensionUri.with({
     path: extensionUri.path + path
-  }));
+  }))
 }
 
 export function escapeAttribute (value: string | vscode.Uri): string {
-  return value.toString().replace(/"/g, "&quot;");
+  return value.toString().replace(/"/g, "&quot;")
 }
 
 export function getHash () {
-  let text = '';
-  const possible = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let text = ''
+  const possible = 'abcdefghijklmnopqrstuvwxyz0123456789'
   for (let i = 0; i < 64; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
   }
-  return text;
+  return text
 }
