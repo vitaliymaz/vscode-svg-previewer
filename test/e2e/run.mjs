@@ -309,6 +309,32 @@ async function main () {
       await page.keyboard.press('Escape')
     }
     await screenshot(page, 'custom-editor')
+
+    // 9. VS Code's built-in Image Preview (the default editor for .svg on current VS Code).
+    // The preview must be reachable from there by the button and by Cmd/Ctrl+K V.
+    for (const via of ['button', 'keybinding']) {
+      await runCommand(page, 'View: Close All Editors')
+      await page.waitForTimeout(500)
+      await quickOpen(page, 'wide.svg')
+      await page.waitForTimeout(1000)
+      // VS Code remembers the editor chosen for the file, so this is only needed the first time
+      if (await page.locator('.editor-group-container .monaco-editor .view-lines').first().isVisible()) {
+        await runCommand(page, 'Image Preview: Reopen as Image Preview')
+        await page.waitForTimeout(1000)
+      }
+      if (via === 'button') {
+        const visible = await waitFor(() => previewButton.isVisible(), { timeout: 5000 }) || false
+        check('preview button shows in built-in Image Preview', visible)
+        if (visible) await previewButton.click()
+      } else {
+        await page.keyboard.press(`${mod}+K`)
+        await page.keyboard.press('V')
+      }
+      frame = await findPreviewFrame(page)
+      state = frame ? (await waitFor(async () => { const s = await previewState(frame); return s.src.includes('#3498db') && s.imgLoaded ? s : undefined }) || await previewState(frame)) : null
+      check(`preview opens from built-in Image Preview (${via})`, !!state && state.imgLoaded)
+      await screenshot(page, `from-image-preview-${via}`)
+    }
   } catch (err) {
     if (page) await screenshot(page, 'failure').catch(() => {})
     throw err
