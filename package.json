@@ -5,6 +5,7 @@
     "version": "0.7.0",
     "publisher": "vitaliymaz",
     "repository": "https://github.com/vitaliymaz/vscode-svg-previewer",
+    "license": "MIT",
     "icon": "logo.png",
     "engines": {
         "vscode": "^1.52.0"
@@ -146,7 +147,7 @@
         "test": "npm run compile && echo 'no tests yet'",
         "test:e2e": "npm run test:e2e:dev && npm run test:e2e:vsix",
         "test:e2e:dev": "npm run compile && node test/e2e/run.mjs",
-        "test:e2e:vsix": "vsce package --skip-license --out .vscode-test/e2e.vsix && node test/e2e/run.mjs --vsix .vscode-test/e2e.vsix && node test/e2e/run.mjs --untrusted --vsix .vscode-test/e2e.vsix",
+        "test:e2e:vsix": "vsce package --out .vscode-test/e2e.vsix && node test/e2e/run.mjs --vsix .vscode-test/e2e.vsix && node test/e2e/run.mjs --untrusted --vsix .vscode-test/e2e.vsix",
         "lint": "standardx */**/*.ts */**/*.tsx",
         "lint:fix": "standardx --fix */**/*.ts */**/*.tsx"
     },

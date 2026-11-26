@@ -10,7 +10,7 @@ Status: ✅ done (committed) · 🔲 to do · ⏸ needs owner decision
 |---|---|---|
 | ✅ | README uses SVG badges | `vsce package` rejected them and the badge service (vsmarketplacebadge.apphb.com) is dead. Replaced with a plain Marketplace link. |
 | ✅ | `"main": "./out/extension"` has no `.js` | Turned out not to block: `vsce` 4.1.1 packages it and the installed `.vsix` works. Changed to `./out/extension.js` anyway (exact path). |
-| ⏸ | No license ([#58](https://github.com/vitaliymaz/vscode-svg-previewer/issues/58)) | Owner picks a license (MIT is typical). `vsce` warns without one (the e2e packaging passes `--skip-license`). |
+| ✅ | No license ([#58](https://github.com/vitaliymaz/vscode-svg-previewer/issues/58)) | MIT (owner's choice): `LICENSE` added, `"license": "MIT"` in package.json. Close the issue after release. |
 
 ## Important
 
