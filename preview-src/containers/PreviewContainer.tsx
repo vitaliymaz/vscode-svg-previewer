@@ -28,8 +28,29 @@ interface PreviewContainerState {
 
 const NEW_LINE_REGEXP = /[\r\n]+/g
 const SVG_TAG_REGEXP = /<svg.+?>/
-const WIDTH_REGEXP = /width=("|')([0-9.,]+)\w*("|')/
-const HEIGHT_REGEXP = /height=("|')([0-9.,]+)\w*("|')/
+// Whole attribute name only (not stroke-width, data-height, ...), optional spaces around "="
+const WIDTH_REGEXP = /\swidth\s*=\s*("|')\s*([0-9]*\.?[0-9]+)\s*([a-z]*)\s*\1/i
+const HEIGHT_REGEXP = /\sheight\s*=\s*("|')\s*([0-9]*\.?[0-9]+)\s*([a-z]*)\s*\1/i
+
+// CSS pixels per unit. Other units (%, ex, ...) are not supported and fall back to the default size.
+const PX_PER_UNIT: { [unit: string]: number } = {
+  '': 1,
+  px: 1,
+  pt: 4 / 3,
+  pc: 16,
+  in: 96,
+  cm: 96 / 2.54,
+  mm: 96 / 25.4,
+  q: 96 / 101.6,
+  em: 16
+}
+
+function parseLength (tag: string, regexp: RegExp): number | null {
+  const match = tag.match(regexp)
+  if (!match) return null
+  const pxPerUnit = PX_PER_UNIT[match[3].toLowerCase()]
+  return pxPerUnit ? parseFloat(match[2]) * pxPerUnit : null
+}
 
 const COLOR_LIGHT_BASE = '#ffffff'
 const COLOR_DARK_BASE = '#1e1e1e'
@@ -133,12 +154,10 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
   getOriginalDimension (data: string): dimension | null {
     const formatted = data.replace(NEW_LINE_REGEXP, ' ')
     const svg = formatted.match(SVG_TAG_REGEXP)
-    let width = null; let height = null
-    if (svg && svg.length) {
-      width = svg[0].match(WIDTH_REGEXP) ? svg[0].match(WIDTH_REGEXP)![2] : null
-      height = svg[0].match(HEIGHT_REGEXP) ? svg[0].match(HEIGHT_REGEXP)![2] : null
-    }
-    return width && height ? { width: parseFloat(width), height: parseFloat(height) } : null
+    if (!svg) return null
+    const width = parseLength(svg[0], WIDTH_REGEXP)
+    const height = parseLength(svg[0], HEIGHT_REGEXP)
+    return width && height ? { width, height } : null
   }
 
   getScaledDimension () {

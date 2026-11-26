@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     stroke-width="2" data-height="7"
+     width = "300pt" height='120pt'
+     viewBox="0 0 300 120" preserveAspectRatio="none">
+  <!-- stroke-width/data-height come before the real size, which is in points (#59) -->
+  <rect x="5" y="5" width="290" height="110" fill="#9b59b6"/>
+</svg>

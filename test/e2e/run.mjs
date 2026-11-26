@@ -247,6 +247,19 @@ async function main () {
     check('wide.svg keeps 200x100 size', state.width === 200 && state.height === 100, `${state.width}x${state.height}`)
     await screenshot(page, 'preview-wide')
 
+    // 6b. Diagrams are not squeezed (#59): the preview box must match the SVG size,
+    // including preserveAspectRatio="none" (PlantUML), units and look-alike attributes
+    for (const [file, color, width, height] of [
+      ['diagram.svg', '#f1c40f', 400, 150], // 400px x 150px
+      ['attributes.svg', '#9b59b6', 400, 160] // 300pt x 120pt, after stroke-width/data-height
+    ]) {
+      await page.locator('.editor-group-container').first().click({ position: { x: 200, y: 200 } })
+      await quickOpen(page, file)
+      state = await waitFor(async () => { const s = await previewState(frame); return s.src.includes(color) && s.imgLoaded ? s : undefined }) || await previewState(frame)
+      check(`${file} keeps ${width}x${height} size`, state.width === width && state.height === height, `${state.width}x${state.height}`)
+      await screenshot(page, `preview-${path.basename(file, '.svg')}`)
+    }
+
     // 7. Broken SVG shows an error
     await page.locator('.editor-group-container').first().click({ position: { x: 200, y: 200 } })
     await quickOpen(page, 'broken.svg')
