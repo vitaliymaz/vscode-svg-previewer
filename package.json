@@ -163,6 +163,7 @@
         "test:e2e": "npm run test:e2e:dev && npm run test:e2e:vsix",
         "test:e2e:dev": "npm run compile && node test/e2e/run.mjs",
         "test:e2e:vsix": "vsce package --out .vscode-test/e2e.vsix && node test/e2e/run.mjs --vsix .vscode-test/e2e.vsix && node test/e2e/run.mjs --untrusted --vsix .vscode-test/e2e.vsix",
+        "demo:gif": "vsce package --out .vscode-test/demo.vsix && node test/e2e/record-demo.mjs .vscode-test/demo.vsix",
         "lint": "standardx */**/*.ts */**/*.tsx",
         "lint:fix": "standardx --fix */**/*.ts */**/*.tsx"
     },

@@ -33,6 +33,7 @@ npm run compile   # tsc (src -> out) + webpack (preview-src -> media/index.js)
 npm run lint      # standardx (JS Standard style, 2 spaces, no semicolons)
 npm run test:e2e  # end-to-end test in a real VS Code: dev mode, then the packaged .vsix trusted and untrusted (see below)
 npm run test:e2e:dev  # quick run: development mode only
+npm run demo:gif  # re-record media/demo.gif (the README demo) from test/e2e/record-demo.mjs
 npx vsce package  # build the .vsix (publishing is manual)
 ```
 

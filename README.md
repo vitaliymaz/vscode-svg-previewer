@@ -2,20 +2,20 @@
 
 [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
 
-![Workflow](media/preview.gif)
+Preview, zoom and fit, switch the background, toggle the transparency grid and bounding box, and watch the preview update as you edit.
+
+![SVG Previewer demo](media/demo.gif)
+
+The preview button and the shortcuts also work when the SVG is open in VS Code's built-in Image Preview.
 
 ## Preview only (instead of the code editor)
 
 In case you want to see SVG preview by default instead of the source code.
 
-![Workflow](media/preview-editor.gif)
-
 #### How to setup?
 - Open any SVG image
 - Execute the command "View: Reopen Editor With..." (via Command Palette)
 - Select "Image Viewer" and set it as the default
-
-![Workflow](media/preview-editor-how-to.gif)
 
 ## Commands:
 
@@ -30,6 +30,8 @@ In case you want to see SVG preview by default instead of the source code.
 | Property             | Description                              | Default |
 |----------------------|------------------------------------------|---------|
 | svg.preview.autoOpen | Open a preview to the side automatically | false   |
+| svg.preview.boundingBox | Show a bounding box around the preview image | false |
+| svg.preview.transparencyGrid | Show a transparency grid behind the preview image | false |
 | svg.preview.background | Background of the preview: `auto` (follow the color theme), `light` or `dark`. Choosing Light or Dark in the preview toolbar updates it | auto |
 
 ## Keyboard Shortcuts:
