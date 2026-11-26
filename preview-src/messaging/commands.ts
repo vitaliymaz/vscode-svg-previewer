@@ -1,4 +1,5 @@
 import messageBroker from './'
+import { IBackground } from '../store/IState'
 
 class Commands {
   changeBoundingBoxVisibility (visible: boolean) {
@@ -12,6 +13,13 @@ class Commands {
     messageBroker.send({
       command: 'changeTransparencyGridVisibility',
       payload: { visible }
+    })
+  }
+
+  changeBackground (background: IBackground) {
+    messageBroker.send({
+      command: 'changeBackground',
+      payload: { background }
     })
   }
 }

@@ -60,6 +60,9 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
         vscode.workspace.getConfiguration('svg').update('preview.transparencyGrid', message.payload.visible, true)
         this.telemetryReporter.sendTelemetryEvent(TELEMETRY_EVENT_TOGGLE_TRANSPARENCY_GRID, { visible: message.payload.visible })
       }
+      if (message.command === 'changeBackground' && ['light', 'dark'].includes(message.payload.background)) {
+        vscode.workspace.getConfiguration('svg').update('preview.background', message.payload.background, true)
+      }
     })
 
     const changeThemeSubscription = vscode.window.onDidChangeActiveColorTheme(() => {
@@ -77,11 +80,12 @@ export class PreviewEditorProvider implements vscode.CustomTextEditorProvider {
     const document = await vscode.workspace.openTextDocument(uri)
     const showBoundingBox = <boolean>vscode.workspace.getConfiguration('svg').get('preview.boundingBox')
     const showTransparencyGrid = <boolean>vscode.workspace.getConfiguration('svg').get('preview.transparencyGrid')
+    const background = <string>vscode.workspace.getConfiguration('svg').get('preview.background')
 
     return updatePreview({
       uri: uri.toString(),
       data: document.getText(),
-      settings: { showBoundingBox, showTransparencyGrid }
+      settings: { showBoundingBox, showTransparencyGrid, background }
     })
   }
 

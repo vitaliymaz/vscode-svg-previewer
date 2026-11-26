@@ -4,5 +4,9 @@
     "svg.showSource.title" : "Show Source",
     "svg.autoOpenPreview.dec": "Open a preview to the side automatically",
     "svg.showSvgBoundingBox.dec": "Show a bounding box around the preview image",
-    "svg.showTransparencyGrid.dec": "Show transparency grid"
+    "svg.showTransparencyGrid.dec": "Show transparency grid",
+    "svg.background.dec": "Background of the preview. Choosing Light or Dark in the preview toolbar updates this setting",
+    "svg.background.auto.dec": "Follow the color theme",
+    "svg.background.light.dec": "Always use a light background",
+    "svg.background.dark.dec": "Always use a dark background"
 }

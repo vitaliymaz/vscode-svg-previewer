@@ -9,6 +9,7 @@ interface PreviewProps {
   onError: () => void;
   dimension: { width: number, height: number, units: string };
   onWheel: JSX.WheelEventHandler<EventTarget>;
+  containerRef: (element: HTMLDivElement | null) => void;
   background: string;
   showTransparencyGrid: boolean;
 }
@@ -19,6 +20,7 @@ const Preview: FunctionalComponent<PreviewProps> = ({
   onError,
   dimension: { width, height, units },
   onWheel,
+  containerRef,
   background,
   settings,
   showTransparencyGrid
@@ -30,7 +32,7 @@ const Preview: FunctionalComponent<PreviewProps> = ({
     minHeight: `${height}${units}`
   }
   return (
-    <div className={`preview ${background} ${settings.showBoundingBox ? 'bounding-box' : ''} ${showTransparencyGrid ? 'transparency-grid' : ''}`} onWheel={onWheel}>
+    <div className={`preview ${background} ${settings.showBoundingBox ? 'bounding-box' : ''} ${showTransparencyGrid ? 'transparency-grid' : ''}`} onWheel={onWheel} ref={containerRef}>
       <img
         src={`data:image/svg+xml,${encodeURIComponent(data)}`}
         onLoad={onLoad}

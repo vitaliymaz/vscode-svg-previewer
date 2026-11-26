@@ -2,6 +2,7 @@ import { h, Component } from 'preact'
 import { connect } from 'redux-zero/preact'
 import Toolbar from '../components/Toolbar'
 import { actions, IState, ISource } from '../store'
+import { IBackground } from '../store/IState'
 import { getByteCountByContent, humanFileSize } from '../utils/fileSize'
 import telemetryReporter from '../messaging/telemetry'
 import messagingCommands from '../messaging/commands'
@@ -13,6 +14,8 @@ interface ToolbarContainerProps {
   zoomIn: Function;
   zoomOut: Function;
   zoomReset: Function;
+  zoomToFit: Function;
+  fitScale: number;
   source: ISource;
   sourceImageValidity: boolean;
   scale: number;
@@ -37,7 +40,9 @@ class ToolbarContainer extends Component<ToolbarContainerProps, ToolbarContainer
   }
 
   handleChangeBackgroundButtonClick = (e: MouseEvent) => {
-    this.props.changeBackground((e.srcElement as HTMLButtonElement).getAttribute('name'))
+    const background = (e.currentTarget as HTMLButtonElement).name as IBackground
+    this.props.changeBackground(background)
+    messagingCommands.changeBackground(background)
   }
 
   handleTransparencyGridBtnClick = () => {
@@ -79,6 +84,8 @@ class ToolbarContainer extends Component<ToolbarContainerProps, ToolbarContainer
         zoomIn={this.zoomIn}
         zoomOut={this.zoomOut}
         zoomReset={this.props.zoomReset}
+        zoomToFit={this.props.zoomToFit}
+        fitScale={this.props.fitScale}
         fileSize={this.getFileSize()}
         sourceImageValidity={this.props.sourceImageValidity}
         onBtnMouseDown={this.handleBtnMouseDown}
@@ -98,6 +105,7 @@ const mapToProps = (state: IState) => ({
   source: state.source,
   sourceImageValidity: state.sourceImageValidity,
   scale: state.scale,
+  fitScale: state.fitScale,
   background: state.background,
   showBoundingBox: state.source.settings.showBoundingBox,
   showTransparencyGrid: state.source.settings.showTransparencyGrid

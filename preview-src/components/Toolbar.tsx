@@ -1,6 +1,7 @@
 import { h, FunctionalComponent, JSX } from 'preact'
 
 import { BoundingBoxIcon } from './icons/BoundingBoxIcon'
+import { FitToWindowIcon } from './icons/FitToWindowIcon'
 import { TransparencyGridIcon } from './icons/TransparencyGridIcon'
 import { ZoomInIcon } from './icons/ZoomInIcon'
 import { ZoomOutIcon } from './icons/ZoomOutIcon'
@@ -11,6 +12,8 @@ interface ToolbarProps {
   zoomIn: Function;
   zoomOut: Function;
   zoomReset: Function;
+  zoomToFit: Function;
+  fitScale: number;
   fileSize?: string;
   sourceImageValidity: boolean;
   onBtnMouseDown: JSX.MouseEventHandler<EventTarget>;
@@ -28,6 +31,8 @@ const Toolbar: FunctionalComponent<ToolbarProps> = ({
   zoomIn,
   zoomOut,
   zoomReset,
+  zoomToFit,
+  fitScale,
   fileSize,
   sourceImageValidity,
   onBtnMouseDown,
@@ -70,6 +75,16 @@ const Toolbar: FunctionalComponent<ToolbarProps> = ({
         title='Zoom Reset'
       >
         <ZoomResetIcon className='icon' />
+      </button>
+      <button
+        name='fit-to-window'
+        className={`btn btn-fit-to-window ${activeBtn === 'fit-to-window' ? 'active' : ''}`}
+        disabled={scale === fitScale || !sourceImageValidity}
+        onClick={zoomToFit as JSX.MouseEventHandler<EventTarget>}
+        onMouseDown={onBtnMouseDown}
+        title='Fit to Window'
+      >
+        <FitToWindowIcon className='icon' />
       </button>
     </div>
     <div className='separator' />

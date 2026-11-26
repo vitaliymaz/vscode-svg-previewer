@@ -30,6 +30,7 @@ In case you want to see SVG preview by default instead of the source code.
 | Property             | Description                              | Default |
 |----------------------|------------------------------------------|---------|
 | svg.preview.autoOpen | Open a preview to the side automatically | false   |
+| svg.preview.background | Background of the preview: `auto` (follow the color theme), `light` or `dark`. Choosing Light or Dark in the preview toolbar updates it | auto |
 
 ## Keyboard Shortcuts:
 

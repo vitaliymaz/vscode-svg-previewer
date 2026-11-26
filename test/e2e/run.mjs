@@ -105,6 +105,29 @@ async function previewState (frame) {
   })
 }
 
+// Rendered image size against the space inside the preview area
+async function fitState (frame) {
+  return frame.evaluate(() => {
+    const preview = document.querySelector('.preview')
+    const img = document.querySelector('.preview img')
+    const style = window.getComputedStyle(preview)
+    const button = document.querySelector('button[name="fit-to-window"]')
+    return {
+      width: img.getBoundingClientRect().width,
+      height: img.getBoundingClientRect().height,
+      availableWidth: preview.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight),
+      availableHeight: preview.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom),
+      scrolls: preview.scrollWidth > preview.clientWidth || preview.scrollHeight > preview.clientHeight,
+      buttonDisabled: button.disabled
+    }
+  })
+}
+
+function isFitted (s) {
+  return !s.scrolls && s.width <= s.availableWidth && s.height <= s.availableHeight &&
+    (s.availableWidth - s.width < 2 || s.availableHeight - s.height < 2)
+}
+
 // Color in the middle of the rendered preview image, read from a screenshot
 // (so it is what is on screen) and named 'blue', 'lime' or the raw rgb value.
 async function imageColor (page, frame) {
@@ -278,10 +301,27 @@ async function main () {
     check('modifier + mouse wheel zooms the preview', !!await waitFor(async () => (await previewState(frame)).width > 100))
     await zoomReset.click()
 
+    // 2b. Fit to window (#60)
+    const fitButton = frame.locator('button[name="fit-to-window"]')
+    check('fit to window enabled when the image does not fit', !(await fitState(frame)).buttonDisabled)
+    await fitButton.click()
+    let fit = await waitFor(async () => { const s = await fitState(frame); return isFitted(s) ? s : undefined }) || await fitState(frame)
+    check('fit to window enlarges square.svg to the panel', isFitted(fit) && fit.width > 100, JSON.stringify(fit))
+    check('fit to window disabled once fitted', fit.buttonDisabled)
+    await screenshot(page, 'fit-to-window')
+    await frame.locator('button[name="zoom-in"]').click()
+    fit = await fitState(frame)
+    check('zooming enables fit to window again', !fit.buttonDisabled && fit.scrolls, JSON.stringify(fit))
+    await zoomReset.click()
+    await waitFor(async () => (await previewState(frame)).width === 100)
+
     // 3. Background
+    const userSettingsPath = path.join(userDataDir, 'User', 'settings.json')
+    const userSettings = () => JSON.parse(fs.readFileSync(userSettingsPath, 'utf8'))
     await frame.locator('button[name="light"]').click()
     state = await previewState(frame)
     check('light background applied', /\blight\b/.test(state.classes), state.classes)
+    check('background choice saved to user settings (#56)', !!await waitFor(() => userSettings()['svg.preview.background'] === 'light'))
     await screenshot(page, 'background-light')
     await frame.locator('button[name="dark"]').click()
     state = await previewState(frame)
@@ -336,6 +376,18 @@ async function main () {
       check(`${file} keeps ${width}x${height} size`, state.width === width && state.height === height, `${state.width}x${state.height}`)
       await screenshot(page, `preview-${path.basename(file, '.svg')}`)
     }
+
+    // 6b2. Fit mode stays on when the preview switches to another file
+    await fitButton.click()
+    await waitFor(async () => isFitted(await fitState(frame)))
+    await page.locator('.editor-group-container').first().click({ position: { x: 200, y: 200 } })
+    await quickOpen(page, 'large.svg')
+    await waitFor(async () => { const s = await previewState(frame); return s.src.includes('#16a085') && s.imgLoaded ? s : undefined })
+    fit = await waitFor(async () => { const s = await fitState(frame); return isFitted(s) ? s : undefined }) || await fitState(frame)
+    check('fit to window shrinks large.svg (3000x1500) to the panel', isFitted(fit) && fit.width < 3000 && Math.abs(fit.width / fit.height - 2) < 0.05, JSON.stringify(fit))
+    check('fit to window stays disabled after switching files', fit.buttonDisabled)
+    await screenshot(page, 'fit-to-window-large')
+    await zoomReset.click()
 
     // 6c. prefers-color-scheme inside the SVG follows the preview background, not the OS (#80)
     await page.locator('.editor-group-container').first().click({ position: { x: 200, y: 200 } })
@@ -426,13 +478,13 @@ async function main () {
     check('preview reloads file changed on disk (no editor open)', !!state && state.src.includes('#e67e22'))
     await screenshot(page, 'reload-from-disk')
 
-    // Persist both toggles, then reload VS Code with only the preview open.
+    // Persist both toggles and a light background (in a dark theme), then reload VS Code with only the preview open.
     await frame.locator('button[name="transparency-grid"]').click()
     await frame.locator('button[name="bounding-box"]').click()
-    const settingsPath = path.join(userDataDir, 'User', 'settings.json')
-    check('grid and bounding box saved to user settings', !!await waitFor(() => {
-      const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'))
-      return settings['svg.preview.transparencyGrid'] && settings['svg.preview.boundingBox']
+    await frame.locator('button[name="light"]').click()
+    check('grid, bounding box and background saved to user settings', !!await waitFor(() => {
+      const settings = userSettings()
+      return settings['svg.preview.transparencyGrid'] && settings['svg.preview.boundingBox'] && settings['svg.preview.background'] === 'light'
     }))
 
     fs.mkdirSync(path.join(workspace, '.vscode'), { recursive: true })
@@ -453,6 +505,20 @@ async function main () {
     check('auto-open displays the SVG beside its editor', !!frame && await page.locator('.editor-group-container').count() === 2 &&
       !!await waitFor(async () => (await previewState(frame)).src.includes('#f1c40f')))
     check('new previews use the saved grid and bounding box', !!frame && await frame.locator('.preview.transparency-grid.bounding-box').isVisible())
+    check('new previews use the saved light background in a dark theme (#56)', !!frame && await frame.locator('.preview.light').isVisible())
+
+    // 11. With background "auto" the preview follows the color theme
+    fs.writeFileSync(userSettingsPath, JSON.stringify({ ...userSettings(), 'svg.preview.background': 'auto' }, null, 2))
+    await page.waitForTimeout(1000)
+    fs.writeFileSync(path.join(workspace, 'diagram.svg'),
+      fs.readFileSync(path.join(workspace, 'diagram.svg'), 'utf8').replace('#f1c40f', '#c0392b'))
+    check('background "auto" uses the dark theme', !!await waitFor(async () => {
+      const s = await previewState(frame)
+      return s.src.includes('#c0392b') && /\bdark\b/.test(s.classes)
+    }))
+    fs.writeFileSync(userSettingsPath, JSON.stringify({ ...userSettings(), 'workbench.colorTheme': 'Default Light Modern' }, null, 2))
+    check('background "auto" follows a switch to a light theme', !!await waitFor(async () => /\blight\b/.test((await previewState(frame)).classes)))
+    await screenshot(page, 'background-auto-light-theme')
   } catch (err) {
     if (page) await screenshot(page, 'failure').catch(() => {})
     throw err

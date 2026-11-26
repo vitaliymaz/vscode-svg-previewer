@@ -1,6 +1,7 @@
 import { h, Component } from 'preact'
 import { connect } from 'redux-zero/preact'
 import { actions, ISource, IState } from '../store'
+import { MIN_SCALE, MAX_SCALE } from '../store/actions'
 import { lightenDarkenColor } from '../utils/lightenDarkenColor'
 import Preview from '../components/Preview'
 import PreviewError from '../components/PreviewError'
@@ -15,6 +16,8 @@ type ChromeWheelEvent = WheelEvent & { wheelDelta: number; };
 interface PreviewContainerProps {
   source: ISource;
   scale: number;
+  fitScale: number;
+  setFitScale: Function;
   background: string;
   zoomIn: Function;
   zoomOut: Function;
@@ -70,6 +73,8 @@ const EDITOR_BACKGROUND_OFFSET = 30
 class PreviewContainer extends Component<PreviewContainerProps, PreviewContainerState> {
   zoomInTelemetryDebounced: Function;
   zoomOutTelemetryDebounced: Function;
+  previewElement: HTMLElement | null = null;
+  resizeObserver = new window.ResizeObserver(() => this.updateFitScale())
 
   constructor (props: PreviewContainerProps) {
     super(props)
@@ -99,8 +104,36 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
     }
   }
 
+  componentDidUpdate (prevProps: PreviewContainerProps) {
+    if (prevProps.source.data !== this.props.source.data) {
+      this.updateFitScale()
+    }
+  }
+
   componentWillUnmount () {
     messageBroker.removeListener('theme:changed', this.defineThemeColors)
+    this.resizeObserver.disconnect()
+  }
+
+  setPreviewElement = (element: HTMLElement | null) => {
+    if (element === this.previewElement) return
+    if (this.previewElement) this.resizeObserver.unobserve(this.previewElement)
+    this.previewElement = element
+    if (element) this.resizeObserver.observe(element)
+  }
+
+  updateFitScale () {
+    const element = this.previewElement
+    if (!element) return
+    const style = window.getComputedStyle(element)
+    const availableWidth = element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
+    const availableHeight = element.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)
+    if (availableWidth <= 0 || availableHeight <= 0) return
+
+    const original = this.getOriginalDimension(this.props.source.data)
+    let scale = original ? Math.min(availableWidth / original.width, availableHeight / original.height) : 1
+    scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale))
+    if (scale !== this.props.fitScale) this.props.setFitScale(scale)
   }
 
   defineThemeColors = () => {
@@ -175,6 +208,7 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
           onError={this.handleError}
           dimension={this.getScaledDimension()}
           onWheel={this.handleOnWheel}
+          containerRef={this.setPreviewElement}
           background={this.props.background}
           settings={this.props.source.settings}
           showTransparencyGrid={this.props.showTransparencyGrid}
@@ -186,6 +220,7 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
 const mapToProps = (state: IState) => ({
   source: state.source,
   scale: state.scale,
+  fitScale: state.fitScale,
   background: state.background,
   showTransparencyGrid: state.source.settings.showTransparencyGrid
 })
