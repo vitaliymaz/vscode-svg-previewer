@@ -335,6 +335,18 @@ async function main () {
       check(`preview opens from built-in Image Preview (${via})`, !!state && state.imgLoaded)
       await screenshot(page, `from-image-preview-${via}`)
     }
+
+    // 10. The preview reloads when the file changes on disk and no text editor has it open (#79)
+    await page.locator('.tab', { hasText: /^wide\.svg/ }).first().click()
+    await page.keyboard.press(`${mod}+W`)
+    await page.waitForTimeout(500)
+    check('only the preview is left open', await page.locator('.tab').count() === 1, `${await page.locator('.tab').count()} tabs`)
+    fs.writeFileSync(path.join(workspace, 'wide.svg'),
+      fs.readFileSync(path.join(workspace, 'wide.svg'), 'utf8').replace('#3498db', '#e67e22'))
+    frame = await findPreviewFrame(page)
+    state = frame ? (await waitFor(async () => { const s = await previewState(frame); return s.src.includes('#e67e22') ? s : undefined }) || await previewState(frame)) : null
+    check('preview reloads file changed on disk (no editor open)', !!state && state.src.includes('#e67e22'))
+    await screenshot(page, 'reload-from-disk')
   } catch (err) {
     if (page) await screenshot(page, 'failure').catch(() => {})
     throw err

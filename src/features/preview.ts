@@ -21,6 +21,13 @@ export class Preview {
 
   private changeThemeSubscription: vscode.Disposable;
 
+  // onDidChangeTextDocument only fires while VS Code holds a text model for the file,
+  // which it releases a while after the editor is closed. Watch the file itself too (#79).
+  private _fileWatcher?: vscode.FileSystemWatcher;
+  private _watchedResource?: string;
+
+  private _disposed = false;
+
   public static async create (source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionPath: string, telemetryReporter: TelemetryReporter) {
     const panel = vscode.window.createWebviewPanel(
       Preview.viewType,
@@ -62,9 +69,11 @@ export class Preview {
     })
 
     this._panel.onDidDispose(() => {
+      this._disposed = true
       this._onDisposeEmitter.fire()
       this.dispose()
       this.changeThemeSubscription.dispose()
+      this.disposeFileWatcher()
     })
 
     this._panel.webview.onDidReceiveMessage(message => {
@@ -95,17 +104,57 @@ export class Preview {
   }
 
   public async update (resource?: vscode.Uri) {
+    if (this._disposed) return
     if (resource) {
       this._resource = resource
     }
     this._panel.title = Preview.getPreviewTitle(this._resource.fsPath)
+    this.watchResource()
 
     const message = await this.getUpdateWebViewMessage(this._resource)
+    // The panel can be closed while the file is being read
+    if (this._disposed) return
     this.postMessage(message)
   }
 
   public dispose () {
     this._panel.dispose()
+  }
+
+  private watchResource () {
+    if (this._watchedResource === this._resource.toString()) return
+    this.disposeFileWatcher()
+    this._watchedResource = this._resource.toString()
+    if (this._resource.scheme !== 'file') return
+
+    const pattern = new vscode.RelativePattern(path.dirname(this._resource.fsPath), path.basename(this._resource.fsPath))
+    this._fileWatcher = vscode.workspace.createFileSystemWatcher(pattern, false, false, true)
+    const onFileChange = () => { this.update() }
+    this._fileWatcher.onDidChange(onFileChange)
+    // Some tools replace the file instead of writing to it
+    this._fileWatcher.onDidCreate(onFileChange)
+  }
+
+  private disposeFileWatcher () {
+    if (this._fileWatcher) {
+      this._fileWatcher.dispose()
+      this._fileWatcher = undefined
+    }
+    this._watchedResource = undefined
+  }
+
+  private async getSourceText (uri: vscode.Uri): Promise<string> {
+    // Unsaved edits win; otherwise read the file, which may be newer than a text model VS Code hasn't reloaded yet
+    const document = vscode.workspace.textDocuments.find(doc => doc.uri.toString() === uri.toString())
+    if (document && document.isDirty) {
+      return document.getText()
+    }
+    try {
+      const bytes = await vscode.workspace.fs.readFile(uri)
+      return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString('utf8').replace(/^\uFEFF/, '')
+    } catch (e) {
+      return (await vscode.workspace.openTextDocument(uri)).getText()
+    }
   }
 
   private postMessage (message: IMessage): void {
@@ -119,13 +168,13 @@ export class Preview {
   }
 
   private async getUpdateWebViewMessage (uri: vscode.Uri) {
-    const document = await vscode.workspace.openTextDocument(uri)
+    const data = await this.getSourceText(uri)
     const showBoundingBox = <boolean>vscode.workspace.getConfiguration('svg').get('preview.boundingBox')
     const showTransparencyGrid = <boolean>vscode.workspace.getConfiguration('svg').get('preview.transparencyGrid')
 
     return updatePreview({
       uri: uri.toString(),
-      data: document.getText(),
+      data,
       settings: { showBoundingBox, showTransparencyGrid }
     })
   }
