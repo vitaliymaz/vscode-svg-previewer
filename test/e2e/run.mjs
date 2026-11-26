@@ -105,6 +105,27 @@ async function previewState (frame) {
   })
 }
 
+// Color in the middle of the rendered preview image, read from a screenshot
+// (so it is what is on screen) and named 'blue', 'lime' or the raw rgb value.
+async function imageColor (page, frame) {
+  const png = await frame.locator('.preview img').screenshot()
+  const [r, g, b] = await page.evaluate(async (base64) => {
+    const img = new Image()
+    img.src = `data:image/png;base64,${base64}`
+    await img.decode()
+    const canvas = document.createElement('canvas')
+    canvas.width = img.width
+    canvas.height = img.height
+    const context = canvas.getContext('2d')
+    context.drawImage(img, 0, 0)
+    return Array.from(context.getImageData(Math.floor(img.width / 2), Math.floor(img.height / 2), 1, 1).data)
+  }, png.toString('base64'))
+  // Loose ranges: screenshots go through the display's color profile
+  if (b > 180 && r < 120 && g < 120) return 'blue'
+  if (g > 180 && r < 160 && b < 120) return 'lime'
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 async function main () {
   console.log(`Mode: ${untrusted ? 'untrusted workspace (Restricted Mode)' : 'trusted workspace'}, ${vsix ? 'installed .vsix' : 'development mode'}`)
   fs.mkdirSync(screenshotsDir, { recursive: true })
@@ -283,6 +304,21 @@ async function main () {
       check(`${file} keeps ${width}x${height} size`, state.width === width && state.height === height, `${state.width}x${state.height}`)
       await screenshot(page, `preview-${path.basename(file, '.svg')}`)
     }
+
+    // 6c. prefers-color-scheme inside the SVG follows the preview background, not the OS (#80)
+    await page.locator('.editor-group-container').first().click({ position: { x: 200, y: 200 } })
+    await quickOpen(page, 'color-scheme.svg')
+    state = await waitFor(async () => { const s = await previewState(frame); return s.src.includes('lime') && s.imgLoaded ? s : undefined }) || await previewState(frame)
+    for (const [os, background, expected] of [['light', 'dark', 'lime'], ['dark', 'light', 'blue']]) {
+      await page.emulateMedia({ colorScheme: os })
+      await frame.locator(`button[name="${background}"]`).click()
+      await page.waitForTimeout(300)
+      const color = await imageColor(page, frame)
+      check(`${background} background renders ${expected} with ${os} OS`, color === expected, color)
+      await screenshot(page, `color-scheme-${background}`)
+    }
+    await page.emulateMedia({ colorScheme: null })
+    await frame.locator('button[name="dark"]').click()
 
     // 7. Broken SVG shows an error
     await page.locator('.editor-group-container').first().click({ position: { x: 200, y: 200 } })

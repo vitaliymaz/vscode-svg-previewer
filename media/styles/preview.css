@@ -36,6 +36,15 @@ body.vscode-light .preview.dark.transparency-grid {
     background-image: linear-gradient(45deg,var(--svg-previewer-editor-background-dark-base-lighter) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-dark-base-lighter) 0,var(--svg-previewer-editor-background-dark-base-lighter)),linear-gradient(45deg,var(--svg-previewer-editor-background-dark-base-lighter) 25%,transparent 0,transparent 75%,var(--svg-previewer-editor-background-dark-base-lighter) 0,var(--svg-previewer-editor-background-dark-base-lighter));
 }
 
+/* The SVG's prefers-color-scheme follows the chosen background, not the OS (#80) */
+.preview.light {
+    color-scheme: light;
+}
+
+.preview.dark {
+    color-scheme: dark;
+}
+
 .preview img {
     margin: auto;
     user-select: none;

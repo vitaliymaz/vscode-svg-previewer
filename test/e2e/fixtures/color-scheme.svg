@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40">
+  <!-- From #80: the color must follow the preview background, not the OS theme -->
+  <style>
+    svg { fill: #333 }
+    @media (prefers-color-scheme: light) { svg { fill: blue } }
+    @media (prefers-color-scheme: dark) { svg { fill: lime } }
+  </style>
+  <rect width="40" height="40"/>
+</svg>
