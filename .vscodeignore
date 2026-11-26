@@ -9,3 +9,4 @@ vsc-extension-quickstart.md
 tslint.json
 .mcp.json
 AGENTS.md
+test/**

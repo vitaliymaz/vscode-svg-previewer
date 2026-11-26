@@ -136,6 +136,7 @@
         "vscode:prepublish": "npm run compile",
         "compile": "rm -rf out && tsc -p ./ && webpack",
         "test": "npm run compile && echo 'no tests yet'",
+        "test:e2e": "npm run compile && node test/e2e/run.mjs",
         "lint": "standardx */**/*.ts */**/*.tsx",
         "lint:fix": "standardx --fix */**/*.ts */**/*.tsx"
     },
@@ -145,6 +146,8 @@
         "@types/vscode": "^1.52.0",
         "@typescript-eslint/eslint-plugin": "^3.10.1",
         "@typescript-eslint/parser": "^3.10.1",
+        "@vscode/test-electron": "^3.1.0",
+        "playwright-core": "^1.65.1",
         "standardx": "^5.0.0",
         "ts-loader": "^9.6.2",
         "typescript": "^5.9.3",
