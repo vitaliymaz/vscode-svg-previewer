@@ -178,7 +178,7 @@
         "playwright-core": "^1.65.1",
         "preact": "^10.29.8",
         "redux-zero": "^5.1.7",
-        "standardx": "^5.0.0",
+        "standardx": "^7.0.0",
         "ts-loader": "^9.6.2",
         "typescript": "^5.9.3",
         "vscode-test": "^1.4.1",
