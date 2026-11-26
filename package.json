@@ -18,6 +18,11 @@
         "onCustomEditor:svgPreviewer.customEditor"
     ],
     "main": "./out/extension",
+    "capabilities": {
+        "untrustedWorkspaces": {
+            "supported": true
+        }
+    },
     "contributes": {
         "customEditors": [
             {

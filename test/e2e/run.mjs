@@ -5,7 +5,8 @@
 // Screenshots: test/e2e/screenshots/
 
 import { _electron as electron } from 'playwright-core'
-import { downloadAndUnzipVSCode } from '@vscode/test-electron'
+import { downloadAndUnzipVSCode, resolveCliArgsFromVSCodeExecutablePath } from '@vscode/test-electron'
+import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -15,6 +16,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const fixturesDir = path.join(root, 'test/e2e/fixtures')
 const screenshotsDir = path.join(root, 'test/e2e/screenshots')
 const isMac = process.platform === 'darwin'
+// --untrusted: open the workspace in Restricted Mode (Workspace Trust on, folder not trusted)
+const untrusted = process.argv.includes('--untrusted')
+// --vsix <file>: install a packaged .vsix like a user would, instead of loading
+// the source folder in development mode (development extensions bypass Workspace Trust)
+const vsixArg = process.argv.indexOf('--vsix')
+const vsix = vsixArg !== -1 ? path.resolve(process.argv[vsixArg + 1]) : null
 const mod = isMac ? 'Meta' : 'Control'
 
 const results = []
@@ -40,7 +47,8 @@ async function waitFor (fn, { timeout = 15000, interval = 250 } = {}) {
 
 async function screenshot (page, name) {
   shot += 1
-  const file = path.join(screenshotsDir, `${String(shot).padStart(2, '0')}-${name}.png`)
+  const prefix = untrusted ? 'untrusted-' : ''
+  const file = path.join(screenshotsDir, `${prefix}${String(shot).padStart(2, '0')}-${name}.png`)
   await page.screenshot({ path: file })
   console.log(`      screenshot: ${path.relative(root, file)}`)
 }
@@ -98,8 +106,11 @@ async function previewState (frame) {
 }
 
 async function main () {
-  fs.rmSync(screenshotsDir, { recursive: true, force: true })
+  console.log(`Mode: ${untrusted ? 'untrusted workspace (Restricted Mode)' : 'trusted workspace'}, ${vsix ? 'installed .vsix' : 'development mode'}`)
   fs.mkdirSync(screenshotsDir, { recursive: true })
+  for (const file of fs.readdirSync(screenshotsDir)) {
+    if (file.startsWith('untrusted-') === untrusted) fs.rmSync(path.join(screenshotsDir, file))
+  }
 
   // Work on copies of the fixtures so the live-update check can edit files.
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'svg-previewer-e2e-'))
@@ -114,7 +125,9 @@ async function main () {
     'workbench.startupEditor': 'none',
     'workbench.colorTheme': 'Default Dark Modern',
     'window.restoreWindows': 'none',
-    'security.workspace.trust.enabled': false,
+    'security.workspace.trust.enabled': untrusted,
+    'security.workspace.trust.startupPrompt': 'never',
+    'security.workspace.trust.banner': 'never',
     'update.mode': 'none',
     'extensions.autoUpdate': false,
     'chat.disableAIFeatures': true,
@@ -125,6 +138,14 @@ async function main () {
   }, null, 2))
 
   const executablePath = await downloadAndUnzipVSCode('stable')
+  const extensionsDir = path.join(tmp, 'extensions')
+
+  if (vsix) {
+    const [cli, ...cliArgs] = resolveCliArgsFromVSCodeExecutablePath(executablePath)
+    const install = spawnSync(cli, [...cliArgs, '--extensions-dir', extensionsDir, '--user-data-dir', userDataDir, '--install-extension', vsix], { encoding: 'utf8' })
+    if (install.status !== 0) throw new Error(`Installing ${vsix} failed:\n${install.stdout}${install.stderr}`)
+    console.log(`Installed ${path.basename(vsix)}`)
+  }
 
   // Don't let the child VS Code attach to a parent VS Code instance.
   const env = Object.fromEntries(Object.entries(process.env)
@@ -135,10 +156,10 @@ async function main () {
     env,
     args: [
       workspace,
-      `--extensionDevelopmentPath=${root}`,
+      ...(vsix ? [] : [`--extensionDevelopmentPath=${root}`]),
       `--user-data-dir=${userDataDir}`,
-      `--extensions-dir=${path.join(tmp, 'extensions')}`,
-      '--disable-workspace-trust',
+      `--extensions-dir=${extensionsDir}`,
+      ...(untrusted ? [] : ['--disable-workspace-trust']),
       '--skip-welcome',
       '--skip-release-notes',
       '--disable-telemetry',
