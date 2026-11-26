@@ -145,7 +145,7 @@
         "@types/vscode": "^1.52.0",
         "@typescript-eslint/eslint-plugin": "^3.10.1",
         "@typescript-eslint/parser": "^3.10.1",
-        "standardx": "^5.0.0",
+        "standardx": "^7.0.0",
         "ts-loader": "^5.4.5",
         "typescript": "^3.9.7",
         "vscode-test": "^1.4.1",
