@@ -52,5 +52,5 @@ Debug with F5 using `.vscode/launch.json`. `npm test` only compiles.
 - `preview.ts` and `previewEditor.ts` duplicate the HTML/CSP and message handling.
 - `preview.ts` loads `media/images/preview.svg`, but the file on disk is `Preview.svg`. The case mismatch breaks the icon on case-sensitive filesystems.
 - Current VS Code opens `.svg` in its built-in Image Preview by default, so the preview button and Cmd+K V only show after "Reopen with Text Editor". The e2e test works around this with `workbench.editorAssociations`.
-- SVG detection is only `uri.path.endsWith('.svg')`. Activation and menus depend on `editorLangId == xml`.
+- SVG detection is by file extension only (`isSvgUri`, and `resourceExtname =~ /^\.svg$/i` in menus and keybindings), not by language id, because other extensions set the language of `.svg` files to `svg` (#78). The e2e test covers this with the stub extension in `test/e2e/svg-language-extension/`.
 - The webpack build runs in `development` mode with inline source maps, even for the published package.

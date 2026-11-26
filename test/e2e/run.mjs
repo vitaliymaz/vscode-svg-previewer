@@ -157,6 +157,7 @@ async function main () {
     args: [
       workspace,
       ...(vsix ? [] : [`--extensionDevelopmentPath=${root}`]),
+      `--extensionDevelopmentPath=${path.join(root, 'test/e2e/svg-language-extension')}`,
       `--user-data-dir=${userDataDir}`,
       `--extensions-dir=${extensionsDir}`,
       ...(untrusted ? [] : ['--disable-workspace-trust']),
@@ -180,15 +181,38 @@ async function main () {
     await page.locator('.monaco-workbench').waitFor({ timeout: 60000 })
     await page.waitForTimeout(2000)
 
+    // 0. An .svg file whose language another extension set to `svg` (#78).
+    // Opened first so it also checks that the extension activates for it.
+    const previewButton = page.locator('.editor-actions .action-label[aria-label^="Open Preview to the Side"]')
+    await quickOpen(page, 'other-language.svg')
+    await page.locator('.monaco-editor .view-lines').first().waitFor()
+    check('preview button shows for language `svg`', await waitFor(() => previewButton.isVisible(), { timeout: 5000 }) || false)
+    await page.keyboard.press(`${mod}+K`)
+    await page.keyboard.press('V')
+    let frame = await findPreviewFrame(page)
+    let state = frame ? (await waitFor(async () => { const s = await previewState(frame); return s.src.includes('#1abc9c') && s.imgLoaded ? s : undefined }) || await previewState(frame)) : null
+    check('Cmd/Ctrl+K V previews language `svg`', !!state && state.imgLoaded)
+    await screenshot(page, 'other-language')
+    await runCommand(page, 'View: Close All Editors')
+    await page.waitForTimeout(500)
+
+    // A plain XML file must not get the button
+    await quickOpen(page, 'not-svg.xml')
+    await page.locator('.monaco-editor .view-lines').first().waitFor()
+    await page.waitForTimeout(500)
+    check('no preview button for .xml', !(await previewButton.isVisible()))
+    await runCommand(page, 'View: Close All Editors')
+    await page.waitForTimeout(500)
+
     // 1. Open preview to the side
     await quickOpen(page, 'square.svg')
     await page.locator('.monaco-editor .view-lines').first().waitFor()
     await runCommand(page, 'Svg: Open Preview to the Side')
-    let frame = await findPreviewFrame(page)
+    frame = await findPreviewFrame(page)
     check('preview to the side opens', !!frame)
     if (!frame) { await screenshot(page, 'no-preview'); return }
 
-    let state = await waitFor(async () => {
+    state = await waitFor(async () => {
       const s = await previewState(frame)
       return s.imgLoaded ? s : undefined
     }) || await previewState(frame)

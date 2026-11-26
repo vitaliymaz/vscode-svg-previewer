@@ -1,0 +1,12 @@
+{
+  "name": "svg-language-stub",
+  "publisher": "e2e",
+  "version": "0.0.1",
+  "description": "Test stub: gives other-language.svg the language id `svg`, like other SVG extensions do (#78)",
+  "engines": { "vscode": "^1.52.0" },
+  "contributes": {
+    "languages": [
+      { "id": "svg", "aliases": ["SVG"], "filenamePatterns": ["other-language.svg"] }
+    ]
+  }
+}

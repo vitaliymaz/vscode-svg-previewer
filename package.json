@@ -14,6 +14,9 @@
     ],
     "activationEvents": [
         "onLanguage:xml",
+        "onLanguage:svg",
+        "onCommand:svg.showPreview",
+        "onCommand:svg.showPreviewToSide",
         "onWebviewPanel:svg-preview",
         "onCustomEditor:svgPreviewer.customEditor"
     ],
@@ -65,7 +68,7 @@
             "editor/title": [
                 {
                     "command": "svg.showPreviewToSide",
-                    "when": "editorLangId == xml",
+                    "when": "resourceExtname =~ /^\\.svg$/i",
                     "alt": "svg.showPreviewToSide",
                     "group": "navigation"
                 },
@@ -79,12 +82,12 @@
             "commandPalette": [
                 {
                     "command": "svg.showPreview",
-                    "when": "editorLangId == xml",
+                    "when": "resourceExtname =~ /^\\.svg$/i",
                     "group": "navigation"
                 },
                 {
                     "command": "svg.showPreviewToSide",
-                    "when": "editorLangId == xml",
+                    "when": "resourceExtname =~ /^\\.svg$/i",
                     "group": "navigation"
                 },
                 {
@@ -97,7 +100,7 @@
                 {
                     "command": "svg.showPreview",
                     "group": "navigation",
-                    "when": "resourceLangId == xml"
+                    "when": "resourceExtname =~ /^\\.svg$/i"
                 }
             ]
         },
@@ -127,13 +130,13 @@
                 "command": "svg.showPreview",
                 "key": "shift+ctrl+v",
                 "mac": "shift+cmd+v",
-                "when": "editorLangId == xml"
+                "when": "resourceExtname =~ /^\\.svg$/i"
             },
             {
                 "command": "svg.showPreviewToSide",
                 "key": "ctrl+k v",
                 "mac": "cmd+k v",
-                "when": "editorLangId == xml"
+                "when": "resourceExtname =~ /^\\.svg$/i"
             }
         ]
     },
