@@ -29,11 +29,14 @@
 - Redesign the toolbar
 
 ### 0.7.1
-
-- Enable preview in Restricted Mode and from VS Code’s built-in Image Preview.
-- Keep preview commands available when another extension assigns the SVG language to a file.
-- Show the first unsaved editor change immediately.
-- Refresh previews when an external tool changes the SVG after its source editor closes.
-- Preserve diagram dimensions and match SVG color schemes to the selected preview background.
-- Restore zoom and error reporting after repairing a malformed SVG.
-- Refresh the toolbar and fix the light-theme tab icon on case-sensitive filesystems.
+- [Support Restricted Mode (Workspace Trust)](https://github.com/vitaliymaz/vscode-svg-previewer/issues/55)
+- Open the preview from VS Code's built-in Image Preview
+- [Keep the preview button and shortcut when another extension sets the language of `.svg` files](https://github.com/vitaliymaz/vscode-svg-previewer/issues/78)
+- [Reload the preview when the SVG file changes on disk](https://github.com/vitaliymaz/vscode-svg-previewer/issues/79)
+- [Make the SVG's `prefers-color-scheme` follow the preview background](https://github.com/vitaliymaz/vscode-svg-previewer/issues/80)
+- [Fix diagrams rendering squeezed or at the wrong size](https://github.com/vitaliymaz/vscode-svg-previewer/issues/59)
+- Show the first unsaved edit in the preview immediately
+- Restore zoom and error reporting after fixing a broken SVG
+- Restyle the toolbar to look closer to native VS Code and fix the light-theme tab icon on case-sensitive file systems
+- [Add MIT license](https://github.com/vitaliymaz/vscode-svg-previewer/issues/58)
+- Fix a security vulnerability in a bundled dependency
