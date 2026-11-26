@@ -28,12 +28,12 @@ There are two separate TypeScript programs:
 ## Commands
 
 ```sh
-npm install
+npm install       # needs Node 18+
 npm run compile   # tsc (src -> out) + webpack (preview-src -> media/index.js)
 npm run lint      # standardx (JS Standard style, 2 spaces, no semicolons)
 ```
 
-Debug with F5 using `.vscode/launch.json`. There are no tests (`npm test` only compiles). CI is Travis (`.travis.yml`, Node 12). It publishes with `vsce` when a master commit message contains `[ci-publish][patch|minor|major]`.
+Debug with F5 using `.vscode/launch.json`. There are no tests (`npm test` only compiles). CI is Travis (`.travis.yml`). It is pinned to Node 12, so it is effectively broken. It publishes with `vsce` when a master commit message contains `[ci-publish][patch|minor|major]`.
 
 ## Conventions
 
@@ -43,7 +43,7 @@ Debug with F5 using `.vscode/launch.json`. There are no tests (`npm test` only c
 
 ## Known rough edges (good starting points)
 
-- The toolchain is outdated: TypeScript 3.9, webpack 4, `@types/node` 7, Travis CI, and the deprecated `vscode-extension-telemetry` 0.1.x.
+- The build uses TypeScript 5, webpack 5 and webpack-cli 6, so it needs Node 18 or newer. Still outdated: `@types/node` 7, `@typescript-eslint` 3, Travis CI (pinned to Node 12, which can no longer build the project), and the deprecated `vscode-extension-telemetry` 0.1.x.
 - `preview.ts` and `previewEditor.ts` duplicate the HTML/CSP and message handling.
 - `preview.ts` loads `media/images/preview.svg`, but the file on disk is `Preview.svg`. The case mismatch breaks the icon on case-sensitive filesystems.
 - SVG detection is only `uri.path.endsWith('.svg')`. Activation and menus depend on `editorLangId == xml`.
