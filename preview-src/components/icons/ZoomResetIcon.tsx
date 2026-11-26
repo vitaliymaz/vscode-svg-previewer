@@ -5,7 +5,9 @@ interface ZoomResetIconProps {
 }
 
 export const ZoomResetIcon: FunctionalComponent<ZoomResetIconProps> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="12" viewBox="0 0 22 12" class={className}>
-        <path fill="currentColor" d="M6.604 12H0v-1.21h2.661V1.523L.151 2.715V1.328L2.866 0H4.12v10.79h2.483V12zm4.031-9.9c.303 0 .558.096.766.29.207.195.311.434.311.715 0 .282-.104.52-.311.715-.208.195-.463.292-.766.292-.297 0-.547-.097-.752-.292-.205-.194-.307-.433-.307-.715 0-.281.102-.52.307-.714.205-.195.455-.292.752-.292zm0 7.069c.303 0 .558.096.766.287.207.192.311.432.311.72 0 .281-.104.518-.311.71-.208.191-.463.287-.766.287-.297 0-.547-.096-.752-.287-.205-.192-.307-.429-.307-.71 0-.288.102-.528.307-.72.205-.191.455-.287.752-.287zM22 12h-6.604v-1.21h2.661V1.523l-2.51 1.193V1.328L18.262 0h1.255v10.79H22V12z"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" class={className}>
+        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="M2.5 5l2-1.5v9M11.5 5l2-1.5v9"/>
+        <circle cx="8" cy="6.5" r="1" fill="currentColor"/>
+        <circle cx="8" cy="10.5" r="1" fill="currentColor"/>
     </svg>
 )

@@ -73,9 +73,11 @@ export class PreviewManager implements vscode.WebviewPanelSerializer {
   }
 
   private onDidChangeTextDocument (event: vscode.TextDocumentChangeEvent): void {
-    const preview = this.getPreviewOf(event.document.uri)
-    if (preview) {
-      preview.update()
+    if (!event.contentChanges.length) return
+    for (const preview of this._previews) {
+      if (preview.source.toString() === event.document.uri.toString()) {
+        preview.update(event.document.uri, event.document.getText())
+      }
     }
   }
 

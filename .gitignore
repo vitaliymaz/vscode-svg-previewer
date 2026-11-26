@@ -4,3 +4,4 @@ node_modules
 media/index.js
 *.vsix
 .history/
+test/e2e/screenshots/

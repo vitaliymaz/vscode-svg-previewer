@@ -1,11 +1,12 @@
-import { h, FunctionalComponent, Ref, JSX } from 'preact'
+import { h, FunctionalComponent, JSX } from 'preact'
 
 import { ISettings } from '../store/IState'
 
 interface PreviewProps {
   data: string;
   settings: ISettings;
-  attachRef: Ref<HTMLImageElement>;
+  onLoad: () => void;
+  onError: () => void;
   dimension: { width: number, height: number, units: string };
   onWheel: JSX.WheelEventHandler<EventTarget>;
   background: string;
@@ -14,7 +15,8 @@ interface PreviewProps {
 
 const Preview: FunctionalComponent<PreviewProps> = ({
   data,
-  attachRef,
+  onLoad,
+  onError,
   dimension: { width, height, units },
   onWheel,
   background,
@@ -31,7 +33,8 @@ const Preview: FunctionalComponent<PreviewProps> = ({
     <div className={`preview ${background} ${settings.showBoundingBox ? 'bounding-box' : ''} ${showTransparencyGrid ? 'transparency-grid' : ''}`} onWheel={onWheel}>
       <img
         src={`data:image/svg+xml,${encodeURIComponent(data)}`}
-        ref={attachRef}
+        onLoad={onLoad}
+        onError={onError}
         style={styles}
         alt=''
       />

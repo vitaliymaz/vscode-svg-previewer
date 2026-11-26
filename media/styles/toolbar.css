@@ -15,47 +15,65 @@
 .toolbar .separator {
     height: 16px;
     border-left: 1px solid var(--vscode-editorGroup-border);
-    margin-left: 16px;
-    margin-right: 16px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
-.toolbar button[disabled] {
-    opacity: 0.6;
-}
+/* Buttons follow VS Code's action bar: 22px hit area, rounded hover
+   background, focus ring, and the "Match Case"-style toggle for selected */
 
 .toolbar .btn-group { display: flex; }
 
-.toolbar .btn-group .btn {
-    width: 16px;
-    height: 16px;
-    padding: 0;
-    background: none;
-    outline: none;
-    border: none;
-    margin-left: 12px;
-}
+.toolbar .btn-group:first-child { margin-left: 12px; }
 
-.toolbar .btn-group:first-child { margin-left: 16px; }
+.toolbar .btn-group .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    margin-left: 4px;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    outline: none;
+    box-sizing: border-box;
+}
 
 .toolbar .btn-group .btn:first-child {
     margin-left: 0;
 }
 
+.toolbar .btn-group .btn:not([disabled]):hover {
+    background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+.toolbar .btn-group .btn.active:not([disabled]) {
+    background-color: var(--vscode-toolbar-activeBackground, var(--vscode-toolbar-hoverBackground));
+}
+
+.toolbar .btn-group .btn:focus-visible {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: -1px;
+}
+
 .toolbar .btn-group .btn.selected {
-    box-shadow: 0px 0px 1px 4px var(--vscode-editorGroup-border);
+    background-color: var(--vscode-inputOption-activeBackground);
+    border-color: var(--vscode-inputOption-activeBorder, transparent);
 }
 
-.toolbar .btn .icon {
-    vertical-align: middle;
+.toolbar .btn-group .btn.selected .icon {
+    color: var(--vscode-inputOption-activeForeground, var(--vscode-icon-foreground));
 }
 
-.toolbar .btn.active {
-    transform: scale(1.272019649);
+body.vscode-high-contrast .toolbar .btn-group .btn:not([disabled]):hover {
+    outline: 1px dashed var(--vscode-contrastActiveBorder);
+    outline-offset: -1px;
 }
 
-.toolbar .btn-group .btn.btn-zoom-reset,
-.toolbar .btn-group .btn.btn-zoom-reset .icon {
-    width: 22px;
+.toolbar .btn-group .btn[disabled] .icon {
+    opacity: 0.4;
 }
 
 /* BG Icons */
@@ -70,9 +88,12 @@
     box-sizing: border-box;
 }
 
+/* Same 13px rounded frame as the line icons */
 .toolbar .bg .icon {
+    width: 14px;
+    height: 14px;
     border: 1px solid var(--vscode-icon-foreground);
-    border-radius: 1px;
+    border-radius: 3px;
 }
 
 body.vscode-high-contrast .toolbar .bg.dark .icon,

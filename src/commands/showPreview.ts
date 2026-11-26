@@ -23,7 +23,14 @@ abstract class PreviewCommand {
   }
 
   protected getActiveEditorUri (): vscode.Uri | undefined {
-    return vscode.window.activeTextEditor && vscode.window.activeTextEditor.document.uri
+    if (vscode.window.activeTextEditor) {
+      return vscode.window.activeTextEditor.document.uri
+    }
+    // Not a text editor, e.g. VS Code's built-in Image Preview. The tabGroups API
+    // (VS Code 1.67+) is not in the 1.52 typings, so feature-detect it.
+    const tabGroups = (vscode.window as any).tabGroups
+    const input = tabGroups && tabGroups.activeTabGroup.activeTab && tabGroups.activeTabGroup.activeTab.input
+    return input && input.uri instanceof vscode.Uri ? input.uri : undefined
   }
 }
 
