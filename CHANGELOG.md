@@ -28,10 +28,6 @@
 - Add preview only option
 - Redesign the toolbar
 
-### Unreleased
-- [Remember the preview background chosen in the toolbar](https://github.com/vitaliymaz/vscode-svg-previewer/issues/56)
-- [Add a Fit to Window button](https://github.com/vitaliymaz/vscode-svg-previewer/issues/60)
-
 ### 0.7.1
 - [Support Restricted Mode (Workspace Trust)](https://github.com/vitaliymaz/vscode-svg-previewer/issues/55)
 - Open the preview from VS Code's built-in Image Preview
@@ -44,3 +40,7 @@
 - Restyle the toolbar to look closer to native VS Code and fix the light-theme tab icon on case-sensitive file systems
 - [Add MIT license](https://github.com/vitaliymaz/vscode-svg-previewer/issues/58)
 - Fix a security vulnerability in a bundled dependency
+
+### 0.8.0
+- [Remember the preview background chosen in the toolbar](https://github.com/vitaliymaz/vscode-svg-previewer/issues/56)
+- [Add a Fit to Window button](https://github.com/vitaliymaz/vscode-svg-previewer/issues/60)
