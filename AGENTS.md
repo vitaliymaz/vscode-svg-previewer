@@ -1,0 +1,50 @@
+# AGENTS.md
+
+VS Code extension **SVG Previewer** (`vitaliymaz.vscode-svg-previewer`). Shows a live preview of `.svg` files in a webview, either beside the editor or as a custom editor ("Image Viewer"). Last released as 0.7.0 (VS Code API ^1.52); the codebase and toolchain are old.
+
+## Layout
+
+There are two separate TypeScript programs:
+
+- `src/`: **extension host** (Node, CommonJS). Compiled by `tsc` to `out/`. Entry point: `src/extension.ts`.
+  - `features/previewManager.ts`: tracks the side-panel previews, auto-open, the `svgPreviewFocus` context key, and webview restore (serializer for `svg-preview`).
+  - `features/preview.ts`: one `WebviewPanel` preview. It builds the HTML and CSP, posts updates, and queues messages while the panel is hidden.
+  - `features/previewEditor.ts`: `CustomTextEditorProvider` for `svgPreviewer.customEditor`. It repeats much of the code in `preview.ts`.
+  - `commands/`: `svg.showPreview`, `svg.showPreviewToSide`, `svg.showSource`, registered through `commandManager.ts`.
+  - `webViewMessaging.ts`: builds the host→webview messages (`source:update`, `theme:changed`).
+  - `telemetry/`: wrapper around `vscode-extension-telemetry` (App Insights key is hardcoded).
+- `preview-src/`: **webview UI** (Preact + redux-zero), bundled by webpack into `media/index.js`. That bundle is gitignored and loaded by the webview.
+  - `store/` holds state and actions (zoom, background, bounding box, transparency grid). `components/` and `containers/` hold the toolbar and preview UI.
+  - `messaging/` contains the `MessageBroker` (listens to `window` messages and sends via `acquireVsCodeApi().postMessage`) plus the webview telemetry.
+  - The SVG is rendered as `<img src="data:image/svg+xml,...">`.
+- `media/` holds static webview assets (CSS, icons) and is the webview's `localResourceRoots`.
+- `package.json` defines all contributions (commands, menus, keybindings, the custom editor, and the `svg.preview.*` settings). UI strings live in `package.nls.json`.
+
+## Message protocol
+
+- Host → webview: `source:update { uri, data, settings }` and `theme:changed`.
+- Webview → host: `sendTelemetryEvent`, `changeBoundingBoxVisibility`, `changeTransparencyGridVisibility`. The last two write the global `svg.preview.*` settings.
+
+## Commands
+
+```sh
+npm install
+npm run compile   # tsc (src -> out) + webpack (preview-src -> media/index.js)
+npm run lint      # standardx (JS Standard style, 2 spaces, no semicolons)
+```
+
+Debug with F5 using `.vscode/launch.json`. There are no tests (`npm test` only compiles). CI is Travis (`.travis.yml`, Node 12). It publishes with `vsce` when a master commit message contains `[ci-publish][patch|minor|major]`.
+
+## Conventions
+
+- Follow the existing style: Standard JS, 2-space indent, no semicolons, a space before function parens.
+- Keep the host and webview code separate. They have separate tsconfigs and share no code, so message shapes are duplicated on both sides.
+- A new setting needs updates in three places: `package.json` contributes, `package.nls.json`, and the code that reads it (`getConfiguration('svg')`).
+
+## Known rough edges (good starting points)
+
+- The toolchain is outdated: TypeScript 3.9, webpack 4, `@types/node` 7, Travis CI, and the deprecated `vscode-extension-telemetry` 0.1.x.
+- `preview.ts` and `previewEditor.ts` duplicate the HTML/CSP and message handling.
+- `preview.ts` loads `media/images/preview.svg`, but the file on disk is `Preview.svg`. The case mismatch breaks the icon on case-sensitive filesystems.
+- SVG detection is only `uri.path.endsWith('.svg')`. Activation and menus depend on `editorLangId == xml`.
+- The webpack build runs in `development` mode with inline source maps, even for the published package.
