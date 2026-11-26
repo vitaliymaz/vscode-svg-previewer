@@ -28,7 +28,7 @@ There are two separate TypeScript programs:
 ## Commands
 
 ```sh
-npm install       # needs Node 18+
+npm install       # needs Node 20.9+
 npm run compile   # tsc (src -> out) + webpack (preview-src -> media/index.js)
 npm run lint      # standardx (JS Standard style, 2 spaces, no semicolons)
 npm run test:e2e  # end-to-end test in a real VS Code: dev mode, then the packaged .vsix trusted and untrusted (see below)
@@ -50,7 +50,7 @@ There is no working CI and none is planned: releases are packaged and published 
 
 ## Known rough edges (good starting points)
 
-- The build uses TypeScript 5, webpack 5 and webpack-cli 6, so it needs Node 18 or newer. Still outdated: `@types/node` 7, `@typescript-eslint` 3, and the deprecated `vscode-extension-telemetry` 0.1.x.
+- The build uses TypeScript 5, webpack 5 and webpack-cli 7, so it needs Node 20.9 or newer. Still outdated: `@types/node` 7, `@typescript-eslint` 3, `standardx` 5 (eslint 6; its dev-only `tmp` and `flatted` advisories need standardx 7, which fails on this code), and the deprecated `vscode-extension-telemetry` 0.1.x.
 - `preview.ts` and `previewEditor.ts` duplicate the HTML/CSP and message handling.
 - `preview.ts` loads `media/images/preview.svg`, but the file on disk is `Preview.svg`. The case mismatch breaks the icon on case-sensitive filesystems.
 - Current VS Code opens `.svg` in its built-in Image Preview (editor id `workbench.editor.imagePreview`) by default. The preview button and Cmd+K V work there too: the commands fall back to the active tab's URI (`tabGroups`, feature-detected because the typings are 1.52). `svg.preview.autoOpen` still only reacts to text editors. Most e2e steps set `workbench.editorAssociations` to open SVGs as text; step 9 covers the Image Preview.
