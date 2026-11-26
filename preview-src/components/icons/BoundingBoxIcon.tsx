@@ -5,7 +5,11 @@ interface BoundingBoxIconProps {
 }
 
 export const BoundingBoxIcon: FunctionalComponent<BoundingBoxIconProps> = ({ className }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class={className}>
-        <path d="M2 13h1v1h10v-1h1V3h-1V2H3v1H2v10zm1 2v1H1c-.552 0-1-.448-1-1v-2h1V3H0V1c0-.552.448-1 1-1h2v1h10V0h2c.552 0 1 .448 1 1v2h-1v10h1v2c0 .552-.448 1-1 1h-2v-1H3z"/>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" class={className}>
+        <path d="M4.5 2.5h7M4.5 13.5h7M2.5 4.5v7M13.5 4.5v7"/>
+        <rect x="1.5" y="1.5" width="2" height="2" rx=".5"/>
+        <rect x="12.5" y="1.5" width="2" height="2" rx=".5"/>
+        <rect x="1.5" y="12.5" width="2" height="2" rx=".5"/>
+        <rect x="12.5" y="12.5" width="2" height="2" rx=".5"/>
     </svg>
 )
