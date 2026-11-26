@@ -52,7 +52,6 @@ There is no working CI and none is planned: releases are packaged and published 
 
 - The build uses TypeScript 5, webpack 5 and webpack-cli 7, so it needs Node 20.9 or newer. Still outdated: `@types/node` 7, `@typescript-eslint` 3, `standardx` 5 (eslint 6; its dev-only `tmp` and `flatted` advisories need standardx 7, which fails on this code), and the deprecated `vscode-extension-telemetry` 0.1.x.
 - `preview.ts` and `previewEditor.ts` duplicate the HTML/CSP and message handling.
-- `preview.ts` loads `media/images/preview.svg`, but the file on disk is `Preview.svg`. The case mismatch breaks the icon on case-sensitive filesystems.
 - Current VS Code opens `.svg` in its built-in Image Preview (editor id `workbench.editor.imagePreview`) by default. The preview button and Cmd+K V work there too: the commands fall back to the active tab's URI (`tabGroups`, feature-detected because the typings are 1.52). `svg.preview.autoOpen` still only reacts to text editors. Most e2e steps set `workbench.editorAssociations` to open SVGs as text; step 9 covers the Image Preview.
 - SVG detection is by file extension only (`isSvgUri`, and `resourceExtname =~ /^\.svg$/i` in menus and keybindings), not by language id, because other extensions set the language of `.svg` files to `svg` (#78). The e2e test covers this with the stub extension in `test/e2e/svg-language-extension/`.
 - The webpack build runs in `development` mode with inline source maps, even for the published package.

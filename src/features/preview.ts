@@ -27,6 +27,7 @@ export class Preview {
   private _watchedResource?: string;
 
   private _disposed = false;
+  private _updateSequence = 0;
 
   public static async create (source: vscode.Uri, viewColumn: vscode.ViewColumn, extensionPath: string, telemetryReporter: TelemetryReporter) {
     const panel = vscode.window.createWebviewPanel(
@@ -103,7 +104,7 @@ export class Preview {
     return this._panel
   }
 
-  public async update (resource?: vscode.Uri) {
+  public async update (resource?: vscode.Uri, sourceText?: string) {
     if (this._disposed) return
     if (resource) {
       this._resource = resource
@@ -111,9 +112,10 @@ export class Preview {
     this._panel.title = Preview.getPreviewTitle(this._resource.fsPath)
     this.watchResource()
 
-    const message = await this.getUpdateWebViewMessage(this._resource)
-    // The panel can be closed while the file is being read
-    if (this._disposed) return
+    const sequence = ++this._updateSequence
+    const message = await this.getUpdateWebViewMessage(this._resource, sourceText)
+    // An editor change or a switch to another SVG can supersede an in-flight read.
+    if (this._disposed || sequence !== this._updateSequence) return
     this.postMessage(message)
   }
 
@@ -167,8 +169,8 @@ export class Preview {
     }
   }
 
-  private async getUpdateWebViewMessage (uri: vscode.Uri) {
-    const data = await this.getSourceText(uri)
+  private async getUpdateWebViewMessage (uri: vscode.Uri, sourceText?: string) {
+    const data = sourceText === undefined ? await this.getSourceText(uri) : sourceText
     const showBoundingBox = <boolean>vscode.workspace.getConfiguration('svg').get('preview.boundingBox')
     const showTransparencyGrid = <boolean>vscode.workspace.getConfiguration('svg').get('preview.transparencyGrid')
 
@@ -182,7 +184,7 @@ export class Preview {
   private setPanelIcon () {
     const root = path.join(this._extensionPath, 'media', 'images')
     this._panel.iconPath = {
-      light: vscode.Uri.file(path.join(root, 'preview.svg')),
+      light: vscode.Uri.file(path.join(root, 'Preview.svg')),
       dark: vscode.Uri.file(path.join(root, 'preview-inverse.svg'))
     }
   }

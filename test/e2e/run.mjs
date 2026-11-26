@@ -225,6 +225,18 @@ async function main () {
     await runCommand(page, 'View: Close All Editors')
     await page.waitForTimeout(500)
 
+    // Same-column shortcut and the return path to the original source.
+    await quickOpen(page, 'square.svg')
+    const sourceGroup = page.locator('.editor-group-container').filter({ has: page.locator('.tab', { hasText: /^square\.svg$/ }) })
+    await page.keyboard.press(`${mod}+Shift+V`)
+    frame = await findPreviewFrame(page)
+    check('Open Preview uses the source column', !!frame && await sourceGroup.locator('.tab.active', { hasText: 'Preview square.svg' }).isVisible())
+    await runCommand(page, 'Svg: Show Source')
+    await sourceGroup.locator('.monaco-editor .view-lines').waitFor()
+    check('Show Source returns to square.svg', await sourceGroup.locator('.tab.active', { hasText: /^square\.svg$/ }).isVisible())
+    await runCommand(page, 'View: Close All Editors')
+    await page.locator('.tab').first().waitFor({ state: 'detached' })
+
     // 1. Open preview to the side
     await quickOpen(page, 'square.svg')
     await page.locator('.monaco-editor .view-lines').first().waitFor()
@@ -256,6 +268,16 @@ async function main () {
     state = await waitFor(async () => { const s = await previewState(frame); return s.width === 100 ? s : undefined }) || await previewState(frame)
     check('zoom reset returns to 100%', state.width === 100, `width ${state.width}`)
 
+    await frame.locator('.preview img').hover()
+    await page.keyboard.down(mod)
+    try {
+      await page.mouse.wheel(0, -120)
+    } finally {
+      await page.keyboard.up(mod)
+    }
+    check('modifier + mouse wheel zooms the preview', !!await waitFor(async () => (await previewState(frame)).width > 100))
+    await zoomReset.click()
+
     // 3. Background
     await frame.locator('button[name="light"]').click()
     state = await previewState(frame)
@@ -283,6 +305,16 @@ async function main () {
     state = await waitFor(async () => { const s = await previewState(frame); return s.src.includes('#2ecc71') ? s : undefined }) || await previewState(frame)
     check('preview updates when file changes', state.src.includes('#2ecc71'))
     await screenshot(page, 'live-update')
+
+    // Insert a text node immediately after the opening tag, without saving.
+    const sourceEditor = page.locator('.editor-group-container').first().locator('.monaco-editor')
+    await sourceEditor.locator('.view-line').first().click({ position: { x: 4, y: 5 } })
+    await page.keyboard.press(isMac ? 'Meta+ArrowRight' : 'End')
+    const marker = 'unsavedPreviewEdit'
+    await page.keyboard.insertText(marker)
+    check('unsaved edits update the preview', !!await waitFor(async () => (await previewState(frame)).src.includes(marker)) &&
+      !fs.readFileSync(path.join(workspace, 'square.svg'), 'utf8').includes(marker))
+    await runCommand(page, 'File: Revert File')
 
     // 6. Preview follows the active editor; non-square image keeps its aspect ratio
     await page.locator('.editor-group-container').first().click({ position: { x: 200, y: 200 } })
@@ -326,6 +358,16 @@ async function main () {
     state = await waitFor(async () => { const s = await previewState(frame); return s.hasError ? s : undefined }) || await previewState(frame)
     check('broken.svg shows error message', state.hasError)
     await screenshot(page, 'preview-broken')
+
+    const brokenFile = path.join(workspace, 'broken.svg')
+    fs.copyFileSync(path.join(fixturesDir, 'square.svg'), brokenFile)
+    await frame.locator('button[name="zoom-in"]').click()
+    check('repaired SVG renders and zoom works', !!await waitFor(async () => {
+      const repaired = await previewState(frame)
+      return repaired.imgLoaded && repaired.width === 150
+    }))
+    fs.copyFileSync(path.join(fixturesDir, 'broken.svg'), brokenFile)
+    check('a second invalid edit shows the error again', !!await waitFor(() => frame.locator('.error-container').isVisible()))
 
     // 8. Custom editor ("Image Viewer")
     await runCommand(page, 'View: Close All Editors')
@@ -383,6 +425,34 @@ async function main () {
     state = frame ? (await waitFor(async () => { const s = await previewState(frame); return s.src.includes('#e67e22') ? s : undefined }) || await previewState(frame)) : null
     check('preview reloads file changed on disk (no editor open)', !!state && state.src.includes('#e67e22'))
     await screenshot(page, 'reload-from-disk')
+
+    // Persist both toggles, then reload VS Code with only the preview open.
+    await frame.locator('button[name="transparency-grid"]').click()
+    await frame.locator('button[name="bounding-box"]').click()
+    const settingsPath = path.join(userDataDir, 'User', 'settings.json')
+    check('grid and bounding box saved to user settings', !!await waitFor(() => {
+      const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'))
+      return settings['svg.preview.transparencyGrid'] && settings['svg.preview.boundingBox']
+    }))
+
+    fs.mkdirSync(path.join(workspace, '.vscode'), { recursive: true })
+    fs.writeFileSync(path.join(workspace, '.vscode', 'settings.json'), JSON.stringify({ 'svg.preview.autoOpen': true }))
+    await Promise.all([
+      page.waitForEvent('framedetached', { predicate: detached => detached === frame, timeout: 30000 }),
+      runCommand(page, 'Developer: Reload Window')
+    ])
+    frame = await findPreviewFrame(page)
+    check('reload restores the preview and its source', !!frame && !!await waitFor(async () => {
+      const restored = await previewState(frame)
+      return restored.src.includes('#e67e22') && restored.imgLoaded
+    }))
+    await runCommand(page, 'View: Close All Editors')
+    await page.locator('.tab').first().waitFor({ state: 'detached' })
+    await quickOpen(page, 'diagram.svg')
+    frame = await findPreviewFrame(page)
+    check('auto-open displays the SVG beside its editor', !!frame && await page.locator('.editor-group-container').count() === 2 &&
+      !!await waitFor(async () => (await previewState(frame)).src.includes('#f1c40f')))
+    check('new previews use the saved grid and bounding box', !!frame && await frame.locator('.preview.transparency-grid.bounding-box').isVisible())
   } catch (err) {
     if (page) await screenshot(page, 'failure').catch(() => {})
     throw err

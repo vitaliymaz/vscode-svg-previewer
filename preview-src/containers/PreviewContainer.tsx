@@ -68,7 +68,6 @@ const cssVariables = {
 const EDITOR_BACKGROUND_OFFSET = 30
 
 class PreviewContainer extends Component<PreviewContainerProps, PreviewContainerState> {
-  private imageEl?: HTMLImageElement;
   zoomInTelemetryDebounced: Function;
   zoomOutTelemetryDebounced: Function;
 
@@ -89,8 +88,6 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
   }
 
   componentDidMount () {
-    this.imageEl!.addEventListener('error', this.onError)
-    this.imageEl!.addEventListener('load', this.onLoad)
     messageBroker.addListener('theme:changed', this.defineThemeColors)
 
     this.defineThemeColors()
@@ -121,12 +118,6 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
     document.documentElement.style.setProperty(cssVariables.editorBackgroundDarkBaseLighter, lightenDarkenColor(COLOR_DARK_BASE, EDITOR_BACKGROUND_OFFSET))
   }
 
-  attachRef = (el: HTMLImageElement | null) => {
-    if (el) {
-      this.imageEl = el
-    }
-  }
-
   handleOnWheel = (event: WheelEvent) => {
     if (!(event.ctrlKey || event.metaKey)) { return }
     event.preventDefault()
@@ -141,12 +132,12 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
     }
   }
 
-  onError = () => {
+  handleError = () => {
     this.setState({ showPreviewError: true })
     this.props.toggleSourceImageValidity(false)
   }
 
-  onLoad = () => {
+  handleLoad = () => {
     this.setState({ showPreviewError: false })
     this.props.toggleSourceImageValidity(true)
   }
@@ -180,7 +171,8 @@ class PreviewContainer extends Component<PreviewContainerProps, PreviewContainer
       : (
         <Preview
           data={this.props.source.data}
-          attachRef={this.attachRef}
+          onLoad={this.handleLoad}
+          onError={this.handleError}
           dimension={this.getScaledDimension()}
           onWheel={this.handleOnWheel}
           background={this.props.background}
