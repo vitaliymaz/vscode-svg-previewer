@@ -20,7 +20,7 @@
         "onWebviewPanel:svg-preview",
         "onCustomEditor:svgPreviewer.customEditor"
     ],
-    "main": "./out/extension",
+    "main": "./out/extension.js",
     "capabilities": {
         "untrustedWorkspaces": {
             "supported": true
@@ -144,7 +144,9 @@
         "vscode:prepublish": "npm run compile",
         "compile": "rm -rf out && tsc -p ./ && webpack",
         "test": "npm run compile && echo 'no tests yet'",
-        "test:e2e": "npm run compile && node test/e2e/run.mjs",
+        "test:e2e": "npm run test:e2e:dev && npm run test:e2e:vsix",
+        "test:e2e:dev": "npm run compile && node test/e2e/run.mjs",
+        "test:e2e:vsix": "vsce package --skip-license --out .vscode-test/e2e.vsix && node test/e2e/run.mjs --vsix .vscode-test/e2e.vsix && node test/e2e/run.mjs --untrusted --vsix .vscode-test/e2e.vsix",
         "lint": "standardx */**/*.ts */**/*.tsx",
         "lint:fix": "standardx --fix */**/*.ts */**/*.tsx"
     },
@@ -155,7 +157,10 @@
         "@typescript-eslint/eslint-plugin": "^3.10.1",
         "@typescript-eslint/parser": "^3.10.1",
         "@vscode/test-electron": "^3.1.0",
+        "@vscode/vsce": "^4.1.1",
         "playwright-core": "^1.65.1",
+        "preact": "^10.29.8",
+        "redux-zero": "^5.1.7",
         "standardx": "^5.0.0",
         "ts-loader": "^9.6.2",
         "typescript": "^5.9.3",
@@ -164,8 +169,6 @@
         "webpack-cli": "^7.3.1"
     },
     "dependencies": {
-        "preact": "^10.29.8",
-        "redux-zero": "^5.1.7",
         "vscode-extension-telemetry": "^0.1.6",
         "vscode-nls": "^4.1.2"
     },

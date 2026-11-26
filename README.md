@@ -1,8 +1,6 @@
 # SVG Previewer
 
-[![](https://vsmarketplacebadge.apphb.com/version/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
-[![](https://vsmarketplacebadge.apphb.com/downloads/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
-[![](https://vsmarketplacebadge.apphb.com/rating/vitaliymaz.vscode-svg-previewer.svg)](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
+[Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=vitaliymaz.vscode-svg-previewer)
 
 ![Workflow](media/preview.gif)
 

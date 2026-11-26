@@ -11,3 +11,7 @@ tslint.json
 AGENTS.md
 test/**
 ISSUES.md
+preview-src/**
+scripts/**
+webpack.config.js
+media/*.gif

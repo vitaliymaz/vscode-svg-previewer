@@ -8,9 +8,9 @@ Status: ✅ done (committed) · 🔲 to do · ⏸ needs owner decision
 
 | Status | Item | Notes |
 |---|---|---|
-| 🔲 | README uses SVG badges | `vsce package` rejects SVG images in README; the badge service (vsmarketplacebadge.apphb.com) is dead. Remove or replace the badges. |
-| 🔲 | `"main": "./out/extension"` has no `.js` | Current `vsce` requires the exact entry file path. Change to `./out/extension.js`. |
-| ⏸ | No license ([#58](https://github.com/vitaliymaz/vscode-svg-previewer/issues/58)) | Owner picks a license (MIT is typical). `vsce` also warns without one. |
+| ✅ | README uses SVG badges | `vsce package` rejected them and the badge service (vsmarketplacebadge.apphb.com) is dead. Replaced with a plain Marketplace link. |
+| ✅ | `"main": "./out/extension"` has no `.js` | Turned out not to block: `vsce` 4.1.1 packages it and the installed `.vsix` works. Changed to `./out/extension.js` anyway (exact path). |
+| ⏸ | No license ([#58](https://github.com/vitaliymaz/vscode-svg-previewer/issues/58)) | Owner picks a license (MIT is typical). `vsce` warns without one (the e2e packaging passes `--skip-license`). |
 
 ## Important
 
@@ -30,9 +30,9 @@ Status: ✅ done (committed) · 🔲 to do · ⏸ needs owner decision
 
 | Status | Item | Notes |
 |---|---|---|
-| 🔲 | Run untrusted + installed `.vsix` checks automatically | `test:e2e` should package the extension and also run `--untrusted --vsix`. Needs the release blockers fixed first. |
-| 🔲 | Package contains unneeded files | `preview-src/`, `scripts/deploy.sh` end up in the `.vsix`. Extend `.vscodeignore`. |
-| 🔲 | CI is dead | Travis is pinned to Node 12. Replace with GitHub Actions (build + lint + e2e). |
+| ✅ | Run untrusted + installed `.vsix` checks automatically | `npm run test:e2e` now runs development mode, then packages `.vscode-test/e2e.vsix` and runs it installed, trusted and in Restricted Mode. `test:e2e:dev` is the quick development-mode run. |
+| ✅ | Package contains unneeded files | `.vscodeignore` now excludes `preview-src/`, `scripts/`, `webpack.config.js` and the README GIFs (vsce points README images to GitHub). `preact`/`redux-zero` moved to devDependencies (bundled by webpack). `.vsix` went from 8.3 MB to 0.66 MB. The rest is the telemetry package's dependencies. |
+| — | CI is dead | Won't fix: the owner publishes manually. `.travis.yml` is left as is (Travis no longer runs it). |
 
 ## Parked (feature requests, not planned now)
 

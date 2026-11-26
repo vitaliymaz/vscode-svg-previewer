@@ -31,14 +31,16 @@ There are two separate TypeScript programs:
 npm install       # needs Node 18+
 npm run compile   # tsc (src -> out) + webpack (preview-src -> media/index.js)
 npm run lint      # standardx (JS Standard style, 2 spaces, no semicolons)
-npm run test:e2e  # end-to-end smoke test in a real VS Code (see below)
+npm run test:e2e  # end-to-end test in a real VS Code: dev mode, then the packaged .vsix trusted and untrusted (see below)
+npm run test:e2e:dev  # quick run: development mode only
+npx vsce package  # build the .vsix (publishing is manual)
 ```
 
 Debug with F5 using `.vscode/launch.json`. `npm test` only compiles.
 
-`npm run test:e2e` downloads VS Code into `.vscode-test/`, launches it with the extension and a copy of `test/e2e/fixtures/`, and drives it with Playwright (`playwright-core` Electron API). It checks the preview, toolbar, live update, error state and custom editor, and saves screenshots to `test/e2e/screenshots/` (gitignored). The script is `test/e2e/run.mjs`. Add a check there when fixing a bug.
+`npm run test:e2e` downloads VS Code into `.vscode-test/`, launches it with the extension and a copy of `test/e2e/fixtures/`, and drives it with Playwright (`playwright-core` Electron API). It checks the preview, toolbar, live update, error state and custom editor, and saves screenshots to `test/e2e/screenshots/` (gitignored). The script is `test/e2e/run.mjs` (flags `--vsix <file>` and `--untrusted`). Add a check there when fixing a bug.
 
- CI is Travis (`.travis.yml`). It is pinned to Node 12, so it is effectively broken. It publishes with `vsce` when a master commit message contains `[ci-publish][patch|minor|major]`.
+There is no working CI and none is planned: releases are packaged and published manually with `vsce`. The old `.travis.yml` (Node 12, publishes on `[ci-publish]` commit messages) no longer runs.
 
 ## Conventions
 
@@ -48,7 +50,7 @@ Debug with F5 using `.vscode/launch.json`. `npm test` only compiles.
 
 ## Known rough edges (good starting points)
 
-- The build uses TypeScript 5, webpack 5 and webpack-cli 6, so it needs Node 18 or newer. Still outdated: `@types/node` 7, `@typescript-eslint` 3, Travis CI (pinned to Node 12, which can no longer build the project), and the deprecated `vscode-extension-telemetry` 0.1.x.
+- The build uses TypeScript 5, webpack 5 and webpack-cli 6, so it needs Node 18 or newer. Still outdated: `@types/node` 7, `@typescript-eslint` 3, and the deprecated `vscode-extension-telemetry` 0.1.x.
 - `preview.ts` and `previewEditor.ts` duplicate the HTML/CSP and message handling.
 - `preview.ts` loads `media/images/preview.svg`, but the file on disk is `Preview.svg`. The case mismatch breaks the icon on case-sensitive filesystems.
 - Current VS Code opens `.svg` in its built-in Image Preview (editor id `workbench.editor.imagePreview`) by default. The preview button and Cmd+K V work there too: the commands fall back to the active tab's URI (`tabGroups`, feature-detected because the typings are 1.52). `svg.preview.autoOpen` still only reacts to text editors. Most e2e steps set `workbench.editorAssociations` to open SVGs as text; step 9 covers the Image Preview.
