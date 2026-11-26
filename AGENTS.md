@@ -31,9 +31,14 @@ There are two separate TypeScript programs:
 npm install       # needs Node 18+
 npm run compile   # tsc (src -> out) + webpack (preview-src -> media/index.js)
 npm run lint      # standardx (JS Standard style, 2 spaces, no semicolons)
+npm run test:e2e  # end-to-end smoke test in a real VS Code (see below)
 ```
 
-Debug with F5 using `.vscode/launch.json`. There are no tests (`npm test` only compiles). CI is Travis (`.travis.yml`). It is pinned to Node 12, so it is effectively broken. It publishes with `vsce` when a master commit message contains `[ci-publish][patch|minor|major]`.
+Debug with F5 using `.vscode/launch.json`. `npm test` only compiles.
+
+`npm run test:e2e` downloads VS Code into `.vscode-test/`, launches it with the extension and a copy of `test/e2e/fixtures/`, and drives it with Playwright (`playwright-core` Electron API). It checks the preview, toolbar, live update, error state and custom editor, and saves screenshots to `test/e2e/screenshots/` (gitignored). The script is `test/e2e/run.mjs`. Add a check there when fixing a bug.
+
+ CI is Travis (`.travis.yml`). It is pinned to Node 12, so it is effectively broken. It publishes with `vsce` when a master commit message contains `[ci-publish][patch|minor|major]`.
 
 ## Conventions
 
@@ -46,5 +51,6 @@ Debug with F5 using `.vscode/launch.json`. There are no tests (`npm test` only c
 - The build uses TypeScript 5, webpack 5 and webpack-cli 6, so it needs Node 18 or newer. Still outdated: `@types/node` 7, `@typescript-eslint` 3, Travis CI (pinned to Node 12, which can no longer build the project), and the deprecated `vscode-extension-telemetry` 0.1.x.
 - `preview.ts` and `previewEditor.ts` duplicate the HTML/CSP and message handling.
 - `preview.ts` loads `media/images/preview.svg`, but the file on disk is `Preview.svg`. The case mismatch breaks the icon on case-sensitive filesystems.
+- Current VS Code opens `.svg` in its built-in Image Preview by default, so the preview button and Cmd+K V only show after "Reopen with Text Editor". The e2e test works around this with `workbench.editorAssociations`.
 - SVG detection is only `uri.path.endsWith('.svg')`. Activation and menus depend on `editorLangId == xml`.
 - The webpack build runs in `development` mode with inline source maps, even for the published package.
