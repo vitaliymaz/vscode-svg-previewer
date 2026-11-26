@@ -1,19 +1,22 @@
 import createStore from 'redux-zero'
 import { IState } from './IState'
+import { resolveBackground } from './background'
 import vscodeApi from '../vscode-api'
 
-const bodyElClassList = document.querySelector('body')!.classList
+const savedSource = vscodeApi.getState()
+const defaultSettings = { showBoundingBox: false, showTransparencyGrid: false, background: 'auto' as const }
+const settings = savedSource ? { ...defaultSettings, ...savedSource.settings } : defaultSettings
 
 const initialState: IState = {
   source: {
-    uri: vscodeApi.getState() ? vscodeApi.getState().uri : null,
-    data: vscodeApi.getState() ? vscodeApi.getState().data : null,
-    settings: vscodeApi.getState() ? vscodeApi.getState().settings : { showBoundingBox: false, showTransparencyGrid: false }
+    uri: savedSource ? savedSource.uri : null,
+    data: savedSource ? savedSource.data : null,
+    settings
   },
   scale: 1,
-  background: bodyElClassList.contains('vscode-dark') || bodyElClassList.contains('vscode-high-contrast')
-    ? 'dark'
-    : 'light',
+  fitToWindow: false,
+  fitScale: 1,
+  background: resolveBackground(settings.background),
   sourceImageValidity: false
 }
 

@@ -89,6 +89,9 @@ export class Preview {
         vscode.workspace.getConfiguration('svg').update('preview.transparencyGrid', message.payload.visible, true)
         this.telemetryReporter.sendTelemetryEvent(TELEMETRY_EVENT_TOGGLE_TRANSPARENCY_GRID, { visible: message.payload.visible })
       }
+      if (message.command === 'changeBackground' && ['light', 'dark'].includes(message.payload.background)) {
+        vscode.workspace.getConfiguration('svg').update('preview.background', message.payload.background, true)
+      }
     })
 
     this.changeThemeSubscription = vscode.window.onDidChangeActiveColorTheme(() => {
@@ -173,11 +176,12 @@ export class Preview {
     const data = sourceText === undefined ? await this.getSourceText(uri) : sourceText
     const showBoundingBox = <boolean>vscode.workspace.getConfiguration('svg').get('preview.boundingBox')
     const showTransparencyGrid = <boolean>vscode.workspace.getConfiguration('svg').get('preview.transparencyGrid')
+    const background = <string>vscode.workspace.getConfiguration('svg').get('preview.background')
 
     return updatePreview({
       uri: uri.toString(),
       data,
-      settings: { showBoundingBox, showTransparencyGrid }
+      settings: { showBoundingBox, showTransparencyGrid, background }
     })
   }
 

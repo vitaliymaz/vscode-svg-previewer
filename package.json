@@ -123,6 +123,21 @@
                     "type": "boolean",
                     "default": false,
                     "description": "%svg.showTransparencyGrid.dec%"
+                },
+                "svg.preview.background": {
+                    "type": "string",
+                    "enum": [
+                        "auto",
+                        "light",
+                        "dark"
+                    ],
+                    "enumDescriptions": [
+                        "%svg.background.auto.dec%",
+                        "%svg.background.light.dec%",
+                        "%svg.background.dark.dec%"
+                    ],
+                    "default": "auto",
+                    "description": "%svg.background.dec%"
                 }
             }
         },
